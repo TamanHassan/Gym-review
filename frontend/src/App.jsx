@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { auth } from "./services/firebase.js";
+import { auth, firebaseInitialized, login, logout } from "./services/firebase.js";
 import { fetchGyms, fetchProfile } from "./services/api.js";
 import LoginButton from "./components/LoginButton.jsx";
 import LogoutButton from "./components/LogoutButton.jsx";
@@ -18,6 +18,12 @@ function App() {
 
   // Monitor auth state changes
   useEffect(() => {
+    if (!firebaseInitialized) {
+      // In test mode, show login form
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
@@ -28,6 +34,7 @@ function App() {
           console.error("Failed to fetch profile:", err);
         }
       }
+      setLoading(false);
     });
 
     return unsubscribe;
@@ -57,17 +64,27 @@ function App() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    // In a real app, use the login function from firebase.js
-    // For demo purposes, this is a placeholder
-    alert("Login form would authenticate with Firebase");
-    setShowLoginForm(false);
-    setLoginEmail("");
-    setLoginPassword("");
+    try {
+      const user = await login(loginEmail, loginPassword);
+      setUser(user);
+      setShowLoginForm(false);
+      setLoginEmail("");
+      setLoginPassword("");
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Login failed: " + error.message);
+    }
   };
 
-  const handleLogout = () => {
-    setProfile(null);
-    setShowLoginForm(false);
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setUser(null);
+      setProfile(null);
+      setShowLoginForm(false);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   const handleGymCreated = (newGym) => {

@@ -21,5 +21,5 @@ if (serviceAccount && !admin.apps.length) {
   });
 }
 
-export const db = admin.firestore();
-export const auth = admin.auth();
+export const db = admin.apps.length > 0 ? admin.firestore() : null;
+export const auth = admin.apps.length > 0 ? admin.auth() : null;

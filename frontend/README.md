@@ -2,7 +2,7 @@
 
 React application with Firebase authentication and REST API integration.
 
-## 📁 Project Structure
+
 
 ```
 frontend/
@@ -27,7 +27,7 @@ frontend/
 └── README.md
 ```
 
-## 🚀 Quick Start
+
 
 1. **Install dependencies**
    ```bash
@@ -51,7 +51,7 @@ frontend/
    npm test
    ```
 
-## 📦 Dependencies
+
 
 ### Core
 - **react**: UI library
@@ -65,7 +65,7 @@ frontend/
 - **vitest**: Unit test runner
 - **@testing-library/react**: Component testing utilities
 
-## 🔑 Environment Variables
+
 
 See `.env.example` for template:
 
@@ -81,7 +81,7 @@ VITE_FIREBASE_APP_ID=xxx
 
 Get these from Firebase Console → Project Settings.
 
-## 🔐 Authentication
+
 
 ### Login Flow
 
@@ -109,7 +109,7 @@ Components that check `isLoggedIn`:
 {!user && <div>Please log in</div>}
 ```
 
-## 🧪 Testing
+
 
 ### Run Tests
 ```bash
@@ -130,14 +130,14 @@ npm test -- --coverage
 - `src/tests/components.test.jsx` - Component logic tests
 
 ### What's Tested
-- ✅ LoginButton renders and handles clicks
-- ✅ LogoutButton calls logout function
-- ✅ GymList displays gyms with correct data
-- ✅ GymList shows loading/error/empty states
-- ✅ ProtectedForm requires authentication
-- ✅ Form validation (rating 1-5, required fields)
+-  LoginButton renders and handles clicks
+-  LogoutButton calls logout function
+-  GymList displays gyms with correct data
+-  GymList shows loading/error/empty states
+-  ProtectedForm requires authentication
+-  Form validation (rating 1-5, required fields)
 
-## 📡 API Integration
+
 
 ### API Service (`src/services/api.js`)
 
@@ -159,7 +159,7 @@ const headers = await getAuthHeaders();
 // Includes: "Authorization: Bearer <token>"
 ```
 
-## 🎨 Components
+
 
 ### GymList
 Displays all gyms in a list format.
@@ -215,21 +215,21 @@ Orchestrates all components and state.
 - Handles login/logout
 - Manages component visibility based on auth
 
-## 🔒 Security
+
 
 ### Token Management
 
 **What we do:**
-- ✅ Token stored in browser memory only (Firebase SDK)
-- ✅ Token never exposed in code
-- ✅ Token automatically refreshed by SDK
-- ✅ Token sent in `Authorization` header only
+-  Token stored in browser memory only (Firebase SDK)
+-  Token never exposed in code
+-  Token automatically refreshed by SDK
+-  Token sent in `Authorization` header only
 
 **What we DON'T do:**
-- ❌ Store token in localStorage
-- ❌ Store token in sessionStorage
-- ❌ Log token to console
-- ❌ Include token in URL/cookies
+-  Store token in localStorage
+-  Store token in sessionStorage
+-  Log token to console
+-  Include token in URL/cookies
 
 ### API Requests
 
@@ -247,7 +247,7 @@ Frontend configured to accept responses from backend only:
 - No wildcard `*` origin
 - Specific backend URL: `http://localhost:3000`
 
-## 🚀 Build & Deploy
+
 
 ### Development
 ```bash
@@ -279,7 +279,7 @@ npm install -g netlify-cli
 netlify deploy --prod --dir=dist
 ```
 
-## 🌐 Environment Specific
+
 
 ### Development
 ```bash
@@ -295,7 +295,7 @@ VITE_FIREBASE_API_KEY=prod-key
 
 Update `.env` before building for production.
 
-## 🐛 Common Issues
+
 
 ### "Cannot find module 'firebase'"
 ```bash
@@ -317,7 +317,7 @@ npm install firebase
 - Check all 6 fields are present in `.env`
 - No trailing spaces in values
 
-## 🔍 Debugging
+
 
 ### Check Auth State
 ```javascript
@@ -340,17 +340,17 @@ console.log("Auth state:", auth.currentUser?.uid);
 
 ## 📱 Features
 
-- ✅ Sign in with email/password
-- ✅ Sign out (clear session)
-- ✅ Browse gyms (public)
-- ✅ View gym details (public)
-- ✅ Create new gym (protected)
-- ✅ Add review with rating (protected)
-- ✅ View profile info (protected)
-- ✅ Responsive design
-- ✅ Error handling with user feedback
+- Sign in with email/password
+- Sign out (clear session)
+- Browse gyms (public)
+- View gym details (public)
+- Create new gym (protected)
+- Add review with rating (protected)
+- View profile info (protected)
+- Responsive design
+- Error handling with user feedback
 
-## 🔗 Useful Links
+
 
 - [Firebase JavaScript SDK](https://firebase.google.com/docs/web/setup)
 - [React Documentation](https://react.dev/)
@@ -359,4 +359,3 @@ console.log("Auth state:", auth.currentUser?.uid);
 
 ---
 
-**Last Updated**: January 2024

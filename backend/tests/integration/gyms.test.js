@@ -1,20 +1,20 @@
 import request from "supertest";
 import { describe, it, expect, beforeEach } from "vitest";
-
-import app from "../../src/app.js";
-import { gyms } from "../../src/data/gyms.js";
+import { resetGyms } from "../../src/data/gyms.js";
 
 // Mock token for testing
 const MOCK_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ0ZXN0LXVzZXIiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20ifQ.test";
 
+let app;
+
 describe("Gym routes", () => {
-  beforeEach(() => {
-    // Reset gyms data before each test
-    gyms.length = 0;
-    gyms.push(
-      { id: 1, name: "Nordic Fitness", location: "Gothenburg", reviews: [] },
-      { id: 2, name: "Iron Paradise", location: "Stockholm", reviews: [] }
-    );
+  beforeEach(async () => {
+    resetGyms();
+    // Dynamically import app to avoid module loading issues
+    if (!app) {
+      const appModule = await import("../../src/app.js");
+      app = appModule.default;
+    }
   });
 
   describe("GET /gyms", () => {

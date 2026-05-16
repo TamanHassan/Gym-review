@@ -17,8 +17,8 @@ export const verifyToken = async (req, res, next) => {
   const token = authHeader.substring(7); // Remove "Bearer " prefix
 
   try {
-    // In test mode, skip actual verification
-    if (!auth.app) {
+    // In test mode (no Firebase initialized), accept any Bearer token
+    if (!auth) {
       req.user = { uid: "test-user-id", email: "test@example.com" };
       return next();
     }
