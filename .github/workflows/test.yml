@@ -30,6 +30,13 @@ jobs:
         run: npm install
         working-directory: ./frontend
       
+      - name: Create Firebase service account key
+        working-directory: ./backend
+        run: |
+          cat <<'EOF' > firebase-key.json
+${{ secrets.FIREBASE_KEY_JSON }}
+EOF
+      
       - name: Run backend tests
         run: npm test
         working-directory: ./backend

@@ -1,24 +1,32 @@
 import admin from "firebase-admin";
-import { readFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { resolve } from "path";
 
-// Initialize Firebase Admin
 const serviceAccountPath = resolve(process.env.FIREBASE_KEY_PATH || "./firebase-key.json");
 
-let serviceAccount;
-try {
-  const keyData = readFileSync(serviceAccountPath, "utf8");
-  serviceAccount = JSON.parse(keyData);
-} catch (error) {
-  console.warn("Firebase key file not found. Running in test mode.");
-  serviceAccount = null;
-}
+let serviceAccount = null;
 
-if (serviceAccount && !admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    projectId: process.env.FIREBASE_PROJECT_ID
-  });
+if (process.env.NODE_ENV === "test") {
+  console.warn("Firebase test mode enabled. Skipping Firebase Admin initialization.");
+} else {
+  try {
+    if (!existsSync(serviceAccountPath)) {
+      throw new Error(`Firebase key file not found at ${serviceAccountPath}`);
+    }
+
+    const keyData = readFileSync(serviceAccountPath, "utf8");
+    serviceAccount = JSON.parse(keyData);
+
+    if (serviceAccount && !admin.apps.length) {
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        projectId: process.env.FIREBASE_PROJECT_ID
+      });
+    }
+  } catch (error) {
+    console.warn("Firebase Admin initialization failed. Running in test mode.", error.message);
+    serviceAccount = null;
+  }
 }
 
 export const db = admin.apps.length > 0 ? admin.firestore() : null;

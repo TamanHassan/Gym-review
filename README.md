@@ -158,7 +158,7 @@ We chose **Firebase Authentication** with token-based authentication because:
 ## Security Decisions
 
 ### 1. **Tokens NOT Stored in localStorage** ✓
-**Why:** Vulnerable to XSS attacks. Firebase SDK manages tokens securely in memory.
+**Why:** Vulnerable to XSS attacks. Firebase auth persistence is configured to use session storage, not localStorage, so tokens are not retained permanently in the browser.
 
 ### 2. **CORS Restricted to Specific Origin** ✓
 **Why:** Prevents cross-origin requests from untrusted domains

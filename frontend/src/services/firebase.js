@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, signOut, setPersistence, browserSessionPersistence } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -19,9 +19,9 @@ try {
   auth = getAuth(app);
   firebaseInitialized = true;
 
-  // Set persistence to LOCAL (session will be persisted across browser refreshes)
-  // But tokens are NOT stored in localStorage - they're managed by Firebase SDK
-  setPersistence(auth, browserLocalPersistence).catch(err => {
+  // Set persistence to SESSION to avoid localStorage storage of auth tokens.
+  // This keeps the session valid for the browser tab while preventing long-term local persistence.
+  setPersistence(auth, browserSessionPersistence).catch(err => {
     console.warn("Persistence error:", err);
   });
 } catch (err) {
