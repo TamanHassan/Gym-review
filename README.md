@@ -111,9 +111,9 @@ npm test -- --watch  # Watch mode
 **Pipeline Status Screenshot:**
 ![GitHub Actions Workflow Passed](docs/screenshots/test.png)
 
-✅ **Status:** Passed  
-✅ **Duration:** 1m 32s  
-✅ **All steps passed:**
+**Status:** Passed  
+ **Duration:** 1m 32s  
+ **All steps passed:**
 - Set up job
 - Run actions/checkout@v3
 - Use Node.js 22.x
