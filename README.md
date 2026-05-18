@@ -100,21 +100,16 @@ npm test -- --watch  # Watch mode
 
 ### Passing Tests (Local)
 
-**Backend Tests:**
-```
-Test Files  3 passed (3)
-      Tests  19 passed (19)
-   Duration  3.12s
-```
+**Backend Tests Screenshot:**
+![Backend Tests Passing](docs/screenshots/backend.png)
 
-**Frontend Tests:**
-```
-Test Files  1 passed (1)
-      Tests  14 passed (14)
-   Duration  10.93s
-```
+**Frontend Tests Screenshot:**
+![Frontend Tests Passing](docs/screenshots/frontend.png)
 
 ### GitHub Actions Pipeline
+
+**Pipeline Status Screenshot:**
+![GitHub Actions Workflow Passed](docs/screenshots/test.png)
 
 ✅ **Status:** Passed  
 ✅ **Duration:** 1m 32s  
