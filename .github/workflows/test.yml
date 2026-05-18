@@ -32,10 +32,9 @@ jobs:
       
       - name: Create Firebase service account key
         working-directory: ./backend
-        run: |
-          cat <<'EOF' > firebase-key.json
-${{ secrets.FIREBASE_KEY_JSON }}
-EOF
+        env:
+          FIREBASE_KEY: ${{ secrets.FIREBASE_KEY_JSON }}
+        run: echo "$FIREBASE_KEY" > firebase-key.json
       
       - name: Run backend tests
         run: npm test
