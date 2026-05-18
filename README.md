@@ -87,20 +87,48 @@ npm test -- --watch  # Watch mode
 
 ### Test Results
 
-**Backend:** 15 tests passing (9 integration + 6 unit)
-- Integration tests verify all routes and 401 responses
-- Unit tests verify business logic and validation
+**Backend:** 19 tests passing
+- 11 integration tests verify all routes (GET/POST), 401 auth failures, and validation
+- 7 unit tests verify token parsing, rating validation, and review structure
+- Test Files: 3 passed | Duration: ~3s
 
-**Frontend:** 10+ component tests passing
-- Tests verify login/logout functionality
-- Tests verify conditional rendering
-- Tests verify data display
+**Frontend:** 14 component tests passing
+- GymList: 5 tests (loading, error, empty state, data display, review counts)
+- ProtectedForm: 5 tests (logged in/out, validation)
+- LoginButton & LogoutButton: 4 tests (render, callback behavior)
+- All tests verify UI logic and conditional rendering
 
-### Screenshot of Passing Tests (Local)
-[Add screenshot of `npm test` output showing all tests passing]
+### Passing Tests (Local)
 
-### Screenshot of GitHub Actions Pipeline
-[Add screenshot of GitHub Actions tab showing green checkmarks for test workflow]
+**Backend Tests:**
+```
+Test Files  3 passed (3)
+      Tests  19 passed (19)
+   Duration  3.12s
+```
+
+**Frontend Tests:**
+```
+Test Files  1 passed (1)
+      Tests  14 passed (14)
+   Duration  10.93s
+```
+
+### GitHub Actions Pipeline
+
+✅ **Status:** Passed  
+✅ **Duration:** 1m 32s  
+✅ **All steps passed:**
+- Set up job
+- Run actions/checkout@v3
+- Use Node.js 22.x
+- Install backend dependencies
+- Install frontend dependencies
+- Create Firebase service account key
+- Run backend tests
+- Run frontend tests
+- Post actions/checkout@v3
+- Complete job
 
 ## API Routes
 
