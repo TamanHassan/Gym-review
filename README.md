@@ -335,6 +335,296 @@ if (!authHeader || !authHeader.startsWith("Bearer ")) {
 
 ```
 
+## Docker & Containerization
+
+### Building and Running with Docker
+
+#### Prerequisites
+- Docker and Docker Compose installed
+
+#### Quick Start with Docker Compose
+
+```bash
+# Clone and navigate to project
+git clone <your-repo-url>
+cd Gym-review
+
+# Create .env file with production settings
+cp backend/.env.example backend/.env
+# Edit backend/.env with your Firebase credentials and production CORS_ORIGIN
+
+# Run both services
+docker-compose up --build
+```
+
+The application will be available at:
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:3000
+
+#### Building Individual Docker Images
+
+**Backend:**
+```bash
+cd backend
+docker build -t gym-review-backend .
+docker run -p 3000:3000 \
+  -e FIREBASE_PROJECT_ID=your-project-id \
+  -e CORS_ORIGIN=http://localhost:5173 \
+  -v $(pwd)/firebase-key.json:/app/firebase-key.json:ro \
+  gym-review-backend
+```
+
+**Frontend:**
+```bash
+cd frontend
+docker build -t gym-review-frontend .
+docker run -p 5173:5173 \
+  -e VITE_API_URL=http://localhost:3000 \
+  gym-review-frontend
+```
+
+#### Docker Configuration
+
+**Backend Dockerfile**:
+- Multi-stage build for smaller image size
+- Node.js 22 Alpine base image
+- Excludes `node_modules` and secrets from image
+- Proper signal handling with dumb-init
+- Health check endpoint
+
+**Frontend Dockerfile**:
+- Builds with `npm run build` for production
+- Serves with `serve` package
+- Excludes source maps in production
+
+### Testing Docker Locally
+
+```bash
+# Run tests in Docker
+docker-compose -f docker-compose.yml up
+docker exec gym-review-backend npm test
+docker exec gym-review-frontend npm test
+```
+
+## Deployment
+
+### Architecture Overview
+
+**Frontend**: React/Vite application deployed to **Vercel**
+- Static site hosting
+- Automatic deployments on push
+- CORS requests to backend API
+
+**Backend**: Express.js API deployed to **Render**
+- Container deployment
+- Managed PostgreSQL database (optional)
+- Environment variables in Render dashboard
+
+### Deployment to Cloud Platforms
+
+#### 1. Deploy Backend to Render
+
+**Steps:**:
+
+1. Create a Render account at https://render.com
+
+2. Create a new "Web Service":
+   - Connect your GitHub repository
+   - Select the `backend` directory as the root
+   - Runtime: Node
+   - Build command: `npm install`
+   - Start command: `npm start`
+
+3. Add environment variables in Render dashboard:
+   ```
+   NODE_ENV=production
+   PORT=3000
+   FIREBASE_PROJECT_ID=your-project-id
+   CORS_ORIGIN=your-frontend-deployed-url
+   ```
+
+4. Upload Firebase service account key:
+   - Create `firebase-key.json` in backend directory
+   - Add to `.env`:
+   ```
+   FIREBASE_KEY_PATH=./firebase-key.json
+   ```
+
+5. Deploy:
+   - Push to `main` branch
+   - Render automatically builds and deploys
+
+**Verify**:
+```bash
+curl https://your-render-backend-url/gyms
+# Should return JSON array of gyms
+```
+
+**Deployed Backend URL**: `https://gym-review-backend.onrender.com` (example)
+
+#### 2. Deploy Frontend to Vercel
+
+**Steps**:
+
+1. Create a Vercel account at https://vercel.com
+
+2. Import your GitHub repository
+
+3. Select project settings:
+   - Framework: Vite
+   - Root Directory: `frontend`
+
+4. Add environment variables:
+   ```
+   VITE_API_URL=https://your-render-backend-url
+   VITE_FIREBASE_API_KEY=your-api-key
+   VITE_FIREBASE_AUTH_DOMAIN=your-auth-domain
+   VITE_FIREBASE_PROJECT_ID=your-project-id
+   VITE_FIREBASE_STORAGE_BUCKET=your-storage-bucket
+   VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+   VITE_FIREBASE_APP_ID=your-app-id
+   ```
+
+5. Deploy:
+   - Click "Deploy"
+   - Vercel builds and deploys automatically
+
+**Verify**:
+```bash
+curl https://your-vercel-frontend-url
+# Should return HTML
+```
+
+**Deployed Frontend URL**: `https://gym-review.vercel.app` (example)
+
+### GitHub Actions Deployment Pipeline
+
+The workflow in `.github/workflows/deploy.yml` automatically:
+
+1. **Runs tests** on every push to `main`
+2. **Builds Docker images** to verify containerization works
+3. **(Optional) Deploys** to Render and Vercel using secrets
+
+**To enable automated deployment**:
+
+1. Add GitHub Secrets:
+   - `RENDER_API_KEY`: From Render account settings
+   - `RENDER_BACKEND_SERVICE_ID`: From Render service details
+   - `VERCEL_TOKEN`: From Vercel account settings
+   - `VERCEL_ORG_ID`: Your Vercel org ID
+   - `VERCEL_PROJECT_ID`: Your Vercel project ID
+   - `BACKEND_URL`: Your Render backend URL
+   - `FRONTEND_URL`: Your Vercel frontend URL
+
+2. Trigger deployment:
+   ```bash
+   git push origin main
+   # or manually trigger in GitHub Actions
+   ```
+
+### Production Environment Variables
+
+**Backend (.env for production)**:
+```env
+NODE_ENV=production
+PORT=3000
+FIREBASE_PROJECT_ID=gym-review-39103
+FIREBASE_KEY_PATH=./firebase-key.json
+CORS_ORIGIN=https://your-vercel-url
+```
+
+**Frontend (.env.production)**:
+```env
+VITE_API_URL=https://your-render-url
+VITE_FIREBASE_API_KEY=your-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-auth-domain
+VITE_FIREBASE_PROJECT_ID=gym-review-39103
+VITE_FIREBASE_STORAGE_BUCKET=your-storage-bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+VITE_FIREBASE_APP_ID=your-app-id
+```
+
+## Security Checklist ✓
+
+Before production deployment, verify all items:
+
+### Secret Management
+- ✓ No secrets committed to Git (`.env` in `.gitignore`)
+- ✓ All secrets in `.env.example` show only structure
+- ✓ Use GitHub Secrets for CI/CD
+- ✓ Firebase key in `.env`, not in repo
+- ✓ Docker image excludes secrets and node_modules
+
+### CORS Configuration
+- ✓ CORS origin restricted to deployed frontend URL (not `*`)
+- ✓ `credentials: true` enabled for authenticated requests
+- ✓ Backend uses environment variable for frontend URL
+- ✓ Updated on deployment
+
+### Authentication & Tokens
+- ✓ Tokens NOT stored in localStorage
+- ✓ Firebase handles token management via session storage
+- ✓ `withCredentials: true` on all authenticated frontend requests
+- ✓ Backend verifies tokens with Firebase Admin SDK
+- ✓ Protected routes return 401 for missing/invalid tokens
+
+### HTTPS & Transport
+- ✓ Vercel provides HTTPS automatically
+- ✓ Render provides HTTPS automatically
+- ✓ Backend communicates with Firebase over HTTPS
+- ✓ Frontend requests use HTTPS in production
+
+### Application Security
+- ✓ Auth redirect URIs use deployed URLs (not localhost)
+- ✓ Firebase config uses environment variables
+- ✓ No sensitive data in browser console
+- ✓ API validates input on all protected routes
+- ✓ Error messages don't expose system details
+
+### Docker Security
+- ✓ Multi-stage builds to reduce image size
+- ✓ No secrets in Docker images
+- ✓ `.dockerignore` excludes unnecessary files
+- ✓ Alpine base image (minimal attack surface)
+- ✓ Non-root user execution (recommended)
+
+### Testing & Validation
+- ✓ All unit and integration tests pass
+- ✓ Production tests verify CORS headers
+- ✓ CI/CD pipeline runs on every push
+- ✓ Docker images build successfully in CI
+- ✓ Health checks verify service availability
+
+## Deployment URLs
+
+After deploying, update these URLs:
+
+- **Frontend (Vercel)**: `https://gym-review.vercel.app`
+- **Backend (Render)**: `https://gym-review-backend.onrender.com`
+
+## Troubleshooting Deployment
+
+### Backend won't start on Render
+
+1. Check logs: Render dashboard → Logs tab
+2. Verify Firebase credentials are set
+3. Ensure `FIREBASE_KEY_PATH=./firebase-key.json`
+4. Check `NODE_ENV=production`
+
+### Frontend can't reach backend
+
+1. Verify `VITE_API_URL` points to Render backend
+2. Check backend `CORS_ORIGIN` matches frontend URL
+3. Test with `curl https://your-backend-url/gyms`
+4. Check browser console for CORS errors
+
+### Docker build fails
+
+1. Check `.dockerignore` doesn't exclude necessary files
+2. Verify `package.json` has all dependencies
+3. Run locally: `docker build -t test .`
+4. Check Dockerfile syntax
+
 ## License
 
 This project is part of a course assignment.

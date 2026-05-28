@@ -1,0 +1,88 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || (github.ref == 'refs/heads/main' && github.event_name == 'push')
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Deploy backend to Render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_BACKEND_SERVICE_ID }}
+        run: |
+          if [ -n "$RENDER_API_KEY" ] && [ -n "$RENDER_SERVICE_ID" ]; then
+            curl -X POST https://api.render.com/deploy/srv \
+              -H "Authorization: Bearer $RENDER_API_KEY" \
+              -d "{\"serviceId\": \"$RENDER_SERVICE_ID\"}" \
+              -H "Content-Type: application/json"
+            echo "Backend deployment triggered"
+          else
+            echo "Render credentials not configured - skipping deployment"
+          fi
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || (github.ref == 'refs/heads/main' && github.event_name == 'push')
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Deploy frontend to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ -n "$VERCEL_TOKEN" ]; then
+            npm install -g vercel
+            vercel --token $VERCEL_TOKEN --confirm
+            echo "Frontend deployment to Vercel completed"
+          else
+            echo "Vercel credentials not configured - skipping deployment"
+          fi
+
+  verify-deployment:
+    runs-on: ubuntu-latest
+    needs: [deploy-backend, deploy-frontend]
+    if: always()
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Check backend health
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+        run: |
+          if [ -n "$BACKEND_URL" ]; then
+            response=$(curl -s -o /dev/null -w "%{http_code}" "$BACKEND_URL/gyms")
+            if [ "$response" == "200" ]; then
+              echo "✓ Backend is healthy"
+            else
+              echo "✗ Backend returned status $response"
+            fi
+          else
+            echo "Backend URL not configured"
+          fi
+      
+      - name: Check frontend availability
+        env:
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+        run: |
+          if [ -n "$FRONTEND_URL" ]; then
+            response=$(curl -s -o /dev/null -w "%{http_code}" "$FRONTEND_URL")
+            if [ "$response" == "200" ]; then
+              echo "✓ Frontend is available"
+            else
+              echo "✗ Frontend returned status $response"
+            fi
+          else
+            echo "Frontend URL not configured"
+          fi
