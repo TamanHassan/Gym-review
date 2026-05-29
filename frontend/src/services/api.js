@@ -26,7 +26,8 @@ export const fetchGyms = async () => {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
-    }
+    },
+    credentials: "include"
   });
 
   if (!response.ok) {
@@ -44,7 +45,8 @@ export const fetchGym = async (id) => {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
-    }
+    },
+    credentials: "include"
   });
 
   if (!response.ok) {
@@ -62,7 +64,8 @@ export const createGym = async (name, location) => {
   const response = await fetch(`${API_BASE_URL}/gyms`, {
     method: "POST",
     headers,
-    body: JSON.stringify({ name, location })
+    body: JSON.stringify({ name, location }),
+    credentials: "include"
   });
 
   if (!response.ok) {
@@ -80,7 +83,8 @@ export const addReview = async (gymId, rating, comment) => {
   const response = await fetch(`${API_BASE_URL}/gyms/${gymId}/reviews`, {
     method: "POST",
     headers,
-    body: JSON.stringify({ rating, comment })
+    body: JSON.stringify({ rating, comment }),
+    credentials: "include"
   });
 
   if (!response.ok) {
@@ -98,6 +102,8 @@ export const fetchProfile = async () => {
   const response = await fetch(`${API_BASE_URL}/profile`, {
     method: "GET",
     headers
+    ,
+    credentials: "include"
   });
 
   if (!response.ok) {

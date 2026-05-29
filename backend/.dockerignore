@@ -16,4 +16,4 @@ build
 *~
 .nyc_output
 coverage
-.firebase-key.json
+firebase-key.json

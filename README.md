@@ -357,6 +357,13 @@ cp backend/.env.example backend/.env
 docker-compose up --build
 ```
 
+If you prefer using the root compose environment file instead, create it from `.env.example` and run:
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
 The application will be available at:
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:3000
@@ -456,11 +463,11 @@ docker exec gym-review-frontend npm test
 
 **Verify**:
 ```bash
-curl https://your-render-backend-url/gyms
+curl https://gym-review-backend-17aw.onrender.com/gyms
 # Should return JSON array of gyms
 ```
 
-**Deployed Backend URL**: `https://gym-review-backend.onrender.com` (example)
+**Deployed Backend URL**: `https://gym-review-backend-17aw.onrender.com`
 
 #### 2. Deploy Frontend to Vercel
 
@@ -495,7 +502,7 @@ curl https://your-vercel-frontend-url
 # Should return HTML
 ```
 
-**Deployed Frontend URL**: `https://gym-review.vercel.app` (example)
+**Deployed Frontend URL**: `https://gym-review.vercel.app` (example) — replace with your real Vercel URL after deploy
 
 ### GitHub Actions Deployment Pipeline
 
