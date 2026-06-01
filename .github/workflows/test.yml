@@ -71,18 +71,16 @@ jobs:
         with:
           context: ./backend
           push: false
+          load: true
           tags: gym-review-backend:latest
-          cache-from: type=registry
-          cache-to: type=inline
       
       - name: Build frontend Docker image
         uses: docker/build-push-action@v4
         with:
           context: ./frontend
           push: false
+          load: true
           tags: gym-review-frontend:latest
-          cache-from: type=registry
-          cache-to: type=inline
       
       - name: Verify Docker builds succeed
         run: echo "Docker images built successfully"
