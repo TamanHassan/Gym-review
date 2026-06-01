@@ -1,6 +1,10 @@
 # Gym Review API
 
-A complete REST API for gym reviews with authentication, testing, and CI/CD pipeline.
+A complete REST API for gym reviews with authentication, Dockerization, testing, and production deployment.
+
+## Deployed URLs
+- Frontend: https://gym-review.vercel.app
+- Backend: https://gym-review-backend-17aw.onrender.com
 
 ## Setup
 
@@ -48,7 +52,9 @@ A complete REST API for gym reviews with authentication, testing, and CI/CD pipe
    VITE_FIREBASE_STORAGE_BUCKET=gym-review-39103.firebasestorage.app
    VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
    VITE_FIREBASE_APP_ID=your-app-id
-   ```
+   ``` 
+
+   For production on Vercel, set `VITE_API_URL` to the deployed backend URL and add the corresponding Firebase environment variables in the Vercel dashboard.
 
 ### Running the Application
 
@@ -183,14 +189,17 @@ We chose **Firebase Authentication** with token-based authentication because:
 ### 1. **Tokens NOT Stored in localStorage** ✓
 **Why:** Vulnerable to XSS attacks. Firebase auth persistence is configured to use session storage, not localStorage, so tokens are not retained permanently in the browser.
 
-### 2. **CORS Restricted to Specific Origin** ✓
+### 2. **CORS Restricted to Specific Origins** ✓
 **Why:** Prevents cross-origin requests from untrusted domains
 ```javascript
 cors({
-  origin: "http://localhost:5173",  // NOT a wildcard *
+  origin: process.env.CORS_ORIGIN || "http://localhost:5173",
   credentials: true
 })
 ```
+
+In production, `CORS_ORIGIN` must be set to the deployed frontend URL:
+- `https://gym-review.vercel.app`
 
 ### 3. **Protected Routes Return 401** ✓
 **Why:** Clear error response allows frontend to redirect to login

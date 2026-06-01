@@ -1,6 +1,6 @@
 import request from "supertest";
 import { describe, it, expect, beforeEach } from "vitest";
-import { resetGyms } from "../../src/data/gyms.js";
+import { resetDatabase } from "../../src/services/database.js";
 
 // Mock token for testing
 const MOCK_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ0ZXN0LXVzZXIiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20ifQ.test";
@@ -9,7 +9,7 @@ let app;
 
 describe("Gym routes", () => {
   beforeEach(async () => {
-    resetGyms();
+    resetDatabase();
     // Dynamically import app to avoid module loading issues
     if (!app) {
       const appModule = await import("../../src/app.js");
@@ -146,6 +146,26 @@ describe("Gym routes", () => {
         });
 
       expect(response.status).toBe(400);
+    });
+  });
+
+  describe("Production behavior", () => {
+    it("should return health status and JSON from /api/health", async () => {
+      const response = await request(app).get("/api/health");
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("status", "ok");
+      expect(response.body).toHaveProperty("timestamp");
+    });
+
+    it("should return CORS headers for allowed origin", async () => {
+      const origin = process.env.CORS_ORIGIN || "http://localhost:5173";
+      const response = await request(app)
+        .get("/gyms")
+        .set("Origin", origin);
+
+      expect(response.status).toBe(200);
+      expect(response.headers["access-control-allow-origin"]).toBe(origin);
     });
   });
 });
