@@ -1,10 +1,10 @@
 import { PrismaClient } from '@prisma/client';
-import { gyms as inMemoryGyms, resetGyms } from '../data/gyms.js';
+import { resetGyms } from '../data/gyms.js';
 
 let prisma = null;
 
-// Use Prisma when a database URL is configured, but keep test mode on the in-memory dataset
-const usePrisma = process.env.NODE_ENV !== 'test' && Boolean(process.env.DATABASE_URL);
+// Use Prisma for all non-test environments
+const usePrisma = process.env.NODE_ENV !== 'test';
 
 const getPrismaClient = () => {
   if (!prisma && usePrisma) {
@@ -27,22 +27,23 @@ export const getAllGyms = async () => {
   if (usePrisma) {
     try {
       const client = getPrismaClient();
-      if (!client) return inMemoryGyms;
+      if (!client) throw new Error('Prisma client not available');
       return await client.gym.findMany({
         include: { reviews: true }
       });
     } catch (error) {
-      return handlePrismaError(error, inMemoryGyms);
+      console.error('getAllGyms error:', error);
+      throw error;
     }
   }
-  return inMemoryGyms;
+  return [];
 };
 
 export const getGymById = async (id) => {
   if (usePrisma) {
     try {
       const client = getPrismaClient();
-      if (!client) return inMemoryGyms.find(g => g.id === Number(id));
+      if (!client) throw new Error('Prisma client not available');
       const gym = await client.gym.findUnique({
         where: { id: Number(id) },
         include: { reviews: true }
@@ -59,10 +60,11 @@ export const getGymById = async (id) => {
         }))
       };
     } catch (error) {
-      return handlePrismaError(error, inMemoryGyms.find(g => g.id === Number(id)));
+      console.error('getGymById error:', error);
+      throw error;
     }
   }
-  return inMemoryGyms.find(g => g.id === Number(id));
+  return null;
 };
 
 export const createGym = async (name, location, userId) => {
@@ -74,24 +76,11 @@ export const createGym = async (name, location, userId) => {
         data: { name, location }
       });
     } catch (error) {
-      return handlePrismaError(error, {
-        id: Math.max(...inMemoryGyms.map(g => g.id), 0) + 1,
-        name,
-        location,
-        reviews: [],
-        createdBy: userId
-      });
+      console.error('createGym error:', error);
+      throw error;
     }
   }
-  const newGym = {
-    id: Math.max(...inMemoryGyms.map(g => g.id), 0) + 1,
-    name,
-    location,
-    reviews: [],
-    createdBy: userId
-  };
-  inMemoryGyms.push(newGym);
-  return newGym;
+  throw new Error('Database not available');
 };
 
 export const addReview = async (gymId, rating, comment, userId) => {
@@ -108,31 +97,11 @@ export const addReview = async (gymId, rating, comment, userId) => {
         }
       });
     } catch (error) {
-      const gym = inMemoryGyms.find(g => g.id === Number(gymId));
-      if (!gym) return null;
-      const review = {
-        id: Math.max(...gym.reviews.map(r => r.id), 0) + 1,
-        rating,
-        comment,
-        userId,
-        createdAt: new Date().toISOString()
-      };
-      gym.reviews.push(review);
-      return handlePrismaError(error, review);
+      console.error('addReview error:', error);
+      throw error;
     }
   }
-  const gym = inMemoryGyms.find(g => g.id === Number(gymId));
-  if (!gym) return null;
-  
-  const review = {
-    id: Math.max(...gym.reviews.map(r => r.id), 0) + 1,
-    rating,
-    comment,
-    userId,
-    createdAt: new Date().toISOString()
-  };
-  gym.reviews.push(review);
-  return review;
+  throw new Error('Database not available');
 };
 
 export const resetDatabase = () => {

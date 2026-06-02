@@ -37,6 +37,6 @@ EXPOSE 3000
 # Use dumb-init to handle signals
 ENTRYPOINT ["dumb-init", "--"]
 
-# Run Prisma migrations with error handling and start the application
-CMD ["sh", "-c", "echo 'Starting database migrations...' && npx prisma migrate deploy --skip-generate 2>&1 || echo 'Migration warning: proceeding without migrations' && echo 'Starting application...' && npm start"]
+# Run Prisma migrations and start the application
+CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
 

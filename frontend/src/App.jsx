@@ -40,22 +40,22 @@ function App() {
     return unsubscribe;
   }, []);
 
+  const refreshGyms = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchGyms();
+      setGyms(data);
+      setError("");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Load gyms on component mount
   useEffect(() => {
-    const loadGyms = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchGyms();
-        setGyms(data);
-        setError("");
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadGyms();
+    refreshGyms();
   }, []);
 
   const handleLoginClick = () => {
@@ -88,7 +88,11 @@ function App() {
   };
 
   const handleGymCreated = (newGym) => {
-    setGyms([...gyms, newGym]);
+    setGyms((currentGyms) => [...currentGyms, newGym]);
+  };
+
+  const handleReviewAdded = async () => {
+    await refreshGyms();
   };
 
   return (
@@ -203,7 +207,7 @@ function App() {
       <GymList gyms={gyms} loading={loading} error={error} />
 
       {user && (
-        <ProtectedForm isLoggedIn={true} onGymCreated={handleGymCreated} />
+        <ProtectedForm isLoggedIn={true} onGymCreated={handleGymCreated} onReviewAdded={handleReviewAdded} />
       )}
 
       {error && (

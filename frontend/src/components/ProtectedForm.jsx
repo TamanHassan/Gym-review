@@ -4,7 +4,7 @@ import { createGym, addReview } from "../services/api.js";
 /**
  * ProtectedForm component - allows authenticated users to create gyms and add reviews
  */
-const ProtectedForm = ({ isLoggedIn = false, onGymCreated = null }) => {
+const ProtectedForm = ({ isLoggedIn = false, onGymCreated = null, onReviewAdded = null }) => {
   const [formType, setFormType] = useState("gym"); // "gym" or "review"
   const [gymName, setGymName] = useState("");
   const [location, setLocation] = useState("");
@@ -59,6 +59,9 @@ const ProtectedForm = ({ isLoggedIn = false, onGymCreated = null }) => {
       setGymId("");
       setComment("");
       setRating(5);
+      if (onReviewAdded) {
+        await onReviewAdded();
+      }
     } catch (error) {
       setMessage(`Error adding review: ${error.message}`);
     } finally {

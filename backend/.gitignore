@@ -2,4 +2,7 @@ node_modules
 # Keep environment variables out of version control
 .env
 
+# Local gym persistence store
+src/data/gyms.store.json
+
 /src/generated/prisma
