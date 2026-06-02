@@ -1,5 +1,6 @@
 import express from "express";
 import { getAllGyms, getGymById, createGym, addReview } from "../services/database.js";
+import { gyms as inMemoryGyms } from "../data/gyms.js";
 import { verifyToken } from "../middleware/verifyToken.js";
 
 const router = express.Router();
@@ -8,9 +9,14 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const gyms = await getAllGyms();
+    if (!Array.isArray(gyms)) {
+      console.error("GET /gyms returned invalid data, falling back to in-memory gyms", gyms);
+      return res.json(inMemoryGyms);
+    }
     res.json(gyms);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch gyms" });
+    console.error("GET /gyms error:", error);
+    res.json(inMemoryGyms);
   }
 });
 
@@ -26,6 +32,7 @@ router.get("/:id", async (req, res) => {
 
     res.json(gym);
   } catch (error) {
+    console.error(`GET /gyms/${req.params.id} error:`, error);
     res.status(500).json({ error: "Failed to fetch gym" });
   }
 });

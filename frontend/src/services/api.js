@@ -1,6 +1,10 @@
 import { getToken } from "./firebase.js";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const DEFAULT_API_URL = import.meta.env.PROD
+  ? "https://gym-review-backend-17aw.onrender.com"
+  : "http://localhost:3000";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || DEFAULT_API_URL;
 
 /**
  * Helper function to add auth token to request headers
@@ -23,11 +27,7 @@ const getAuthHeaders = async () => {
  */
 export const fetchGyms = async () => {
   const response = await fetch(`${API_BASE_URL}/gyms`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    credentials: "include"
+    method: "GET"
   });
 
   if (!response.ok) {
@@ -42,11 +42,7 @@ export const fetchGyms = async () => {
  */
 export const fetchGym = async (id) => {
   const response = await fetch(`${API_BASE_URL}/gyms/${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    credentials: "include"
+    method: "GET"
   });
 
   if (!response.ok) {
@@ -101,8 +97,7 @@ export const fetchProfile = async () => {
   const headers = await getAuthHeaders();
   const response = await fetch(`${API_BASE_URL}/profile`, {
     method: "GET",
-    headers
-    ,
+    headers,
     credentials: "include"
   });
 
