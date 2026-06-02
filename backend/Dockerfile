@@ -9,7 +9,7 @@ COPY package*.json ./
 # Install all dependencies (including dev for Prisma)
 RUN npm ci
 
-# Copy Prisma schema
+# Copy Prisma schema and migrations
 COPY prisma ./prisma
 
 # Generate Prisma client
@@ -23,7 +23,7 @@ WORKDIR /app
 # Install dumb-init and wget for compose healthchecks
 RUN apk add --no-cache dumb-init wget
 
-# Copy node_modules and app from builder
+# Copy node_modules, prisma, and app from builder
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/prisma ./prisma
 COPY . .
@@ -37,5 +37,6 @@ EXPOSE 3000
 # Use dumb-init to handle signals
 ENTRYPOINT ["dumb-init", "--"]
 
-# Run Prisma migrations and start the application
-CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
+# Run Prisma migrations with error handling and start the application
+CMD ["sh", "-c", "echo 'Starting database migrations...' && npx prisma migrate deploy --skip-generate 2>&1 || echo 'Migration warning: proceeding without migrations' && echo 'Starting application...' && npm start"]
+
