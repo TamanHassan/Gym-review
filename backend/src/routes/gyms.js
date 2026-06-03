@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllGyms, getGymById, createGym, addReview, deleteGym, deleteReview } from "../services/database.js";
+import { getAllGyms, getGymById, createGym, addReview, deleteGym, deleteReview, getUserRole } from "../services/database.js";
 import { gyms as inMemoryGyms } from "../data/gyms.js";
 import { verifyToken } from "../middleware/verifyToken.js";
 
@@ -46,6 +46,15 @@ router.post("/", verifyToken, async (req, res) => {
       return res.status(400).json({
         error: "Bad Request",
         message: "Name and location are required"
+      });
+    }
+
+    // Check if user has owner role
+    const role = await getUserRole(req.user.uid);
+    if (role !== "owner") {
+      return res.status(403).json({
+        error: "Forbidden",
+        message: "Only owners can create gyms"
       });
     }
 

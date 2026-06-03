@@ -10,6 +10,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [gyms, setGyms] = useState([]);
   const [profile, setProfile] = useState(null);
+  const [userRole, setUserRole] = useState("user");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showLoginForm, setShowLoginForm] = useState(false);
@@ -30,6 +31,7 @@ function App() {
         try {
           const userProfile = await fetchProfile();
           setProfile(userProfile);
+          setUserRole(userProfile.role || "user");
         } catch (err) {
           console.error("Failed to fetch profile:", err);
         }
@@ -183,7 +185,7 @@ function App() {
       <GymList gyms={gyms} loading={loading} error={error} user={user} onGymDeleted={handleGymDeleted} onReviewDeleted={handleReviewDeleted} />
 
       {user && (
-        <ProtectedForm isLoggedIn={true} onGymCreated={handleGymCreated} onReviewAdded={handleReviewAdded} />
+        <ProtectedForm isLoggedIn={true} userRole={userRole} onGymCreated={handleGymCreated} onReviewAdded={handleReviewAdded} />
       )}
 
       {error && (

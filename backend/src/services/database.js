@@ -3,6 +3,9 @@ import { resetGyms, gyms } from '../data/gyms.js';
 
 let prisma = null;
 
+// In-memory users for testing
+const users = new Map();
+
 // Use Prisma for all non-test environments
 const usePrisma = process.env.NODE_ENV !== 'test';
 
@@ -172,9 +175,84 @@ export const deleteReview = async (gymId, reviewId, userId) => {
   return deletedReview;
 };
 
+export const getUserRole = async (uid) => {
+  if (usePrisma) {
+    try {
+      const client = getPrismaClient();
+      if (!client) throw new Error('Prisma client not available');
+      const user = await client.user.findUnique({
+        where: { id: uid }
+      });
+      return user ? user.role : 'user';
+    } catch (error) {
+      console.error('getUserRole error:', error);
+      return 'user';
+    }
+  }
+  const user = users.get(uid);
+  return user ? user.role : 'user';
+};
+
+export const createUserOrGetRole = async (uid, email, role = 'user') => {
+  if (usePrisma) {
+    try {
+      const client = getPrismaClient();
+      if (!client) throw new Error('Prisma client not available');
+      let user = await client.user.findUnique({
+        where: { id: uid }
+      });
+      if (!user) {
+        user = await client.user.create({
+          data: {
+            id: uid,
+            email: email,
+            role: role
+          }
+        });
+      }
+      return user.role;
+    } catch (error) {
+      console.error('createUserOrGetRole error:', error);
+      return 'user';
+    }
+  }
+  let user = users.get(uid);
+  if (!user) {
+    user = { id: uid, email: email, role: role };
+    users.set(uid, user);
+  }
+  return user.role;
+};
+
+export const setUserRole = async (uid, role) => {
+  if (usePrisma) {
+    try {
+      const client = getPrismaClient();
+      if (!client) throw new Error('Prisma client not available');
+      const user = await client.user.upsert({
+        where: { id: uid },
+        update: { role },
+        create: { id: uid, email: 'unknown', role }
+      });
+      return user.role;
+    } catch (error) {
+      console.error('setUserRole error:', error);
+      return null;
+    }
+  }
+  const user = users.get(uid);
+  if (user) {
+    user.role = role;
+    users.set(uid, user);
+    return role;
+  }
+  return null;
+};
+
 export const resetDatabase = () => {
   if (!usePrisma) {
     resetGyms();
+    users.clear();
   }
 };
 
