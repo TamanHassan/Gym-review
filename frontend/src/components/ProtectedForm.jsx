@@ -4,7 +4,7 @@ import { createGym, addReview } from "../services/api.js";
 /**
  * ProtectedForm component - allows authenticated users to create gyms and add reviews
  */
-const ProtectedForm = ({ isLoggedIn = false, userRole = "user", onGymCreated = null, onReviewAdded = null }) => {
+const ProtectedForm = ({ isLoggedIn = false, userRole = "employee", onGymCreated = null, onReviewAdded = null }) => {
   const [formType, setFormType] = useState(userRole === "owner" ? "gym" : "review"); // "gym" or "review"
   const [gymName, setGymName] = useState("");
   const [location, setLocation] = useState("");

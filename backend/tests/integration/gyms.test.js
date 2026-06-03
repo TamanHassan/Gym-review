@@ -66,7 +66,7 @@ describe("Gym routes", () => {
       expect(response.body.error).toBe("Unauthorized");
     });
 
-    it("should return 403 for non-owner user", async () => {
+    it("should return 403 for non-owner user (employee)", async () => {
       const newGym = {
         name: "New Gym",
         location: "Copenhagen"

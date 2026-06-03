@@ -13,7 +13,7 @@ datasource db {
 model User {
   id        String   @id
   email     String   @unique
-  role      String   @default("user") // "user" or "owner"
+  role      String   @default("employee") // "employee" or "owner"
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
