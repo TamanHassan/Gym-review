@@ -18,16 +18,9 @@ const LogoutButton = ({ onLogoutClick }) => {
   };
 
   return (
-    <button 
+    <button
       onClick={handleClick}
-      style={{
-        padding: "10px 20px",
-        backgroundColor: "#dc3545",
-        color: "white",
-        border: "none",
-        borderRadius: "4px",
-        cursor: "pointer"
-      }}
+      className="btn btn-secondary"
     >
       Logout
     </button>

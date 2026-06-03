@@ -149,6 +149,82 @@ describe("Gym routes", () => {
     });
   });
 
+  describe("DELETE /gyms/:id", () => {
+    it("should return 401 without authentication token", async () => {
+      const response = await request(app).delete("/gyms/1");
+
+      expect(response.status).toBe(401);
+      expect(response.body.error).toBe("Unauthorized");
+    });
+
+    it("should return 404 for invalid gym id", async () => {
+      const response = await request(app)
+        .delete("/gyms/999")
+        .set("Authorization", `Bearer ${MOCK_TOKEN}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.message).toBe("Gym not found");
+    });
+
+    it("should return 200 and delete gym with valid token", async () => {
+      const response = await request(app)
+        .delete("/gyms/1")
+        .set("Authorization", `Bearer ${MOCK_TOKEN}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.message).toBe("Gym deleted successfully");
+      expect(response.body.gym).toHaveProperty("id");
+      expect(response.body.gym.id).toBe(1);
+    });
+  });
+
+  describe("DELETE /gyms/:id/reviews/:reviewId", () => {
+    it("should return 401 without authentication token", async () => {
+      const response = await request(app).delete("/gyms/1/reviews/1");
+
+      expect(response.status).toBe(401);
+      expect(response.body.error).toBe("Unauthorized");
+    });
+
+    it("should return 404 if gym does not exist", async () => {
+      const response = await request(app)
+        .delete("/gyms/999/reviews/1")
+        .set("Authorization", `Bearer ${MOCK_TOKEN}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.message).toBe("Gym not found");
+    });
+
+    it("should return 404 if review does not exist", async () => {
+      const response = await request(app)
+        .delete("/gyms/1/reviews/999")
+        .set("Authorization", `Bearer ${MOCK_TOKEN}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.message).toBe("Review not found");
+    });
+
+    it("should return 200 and delete review with valid token", async () => {
+      // First create a review
+      await request(app)
+        .post("/gyms/1/reviews")
+        .set("Authorization", `Bearer ${MOCK_TOKEN}`)
+        .send({
+          rating: 5,
+          comment: "Test review"
+        });
+
+      // Then delete it
+      const response = await request(app)
+        .delete("/gyms/1/reviews/1")
+        .set("Authorization", `Bearer ${MOCK_TOKEN}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.message).toBe("Review deleted successfully");
+      expect(response.body.review).toHaveProperty("id");
+    });
+  });
+
   describe("Production behavior", () => {
     it("should return health status and JSON from /api/health", async () => {
       const response = await request(app).get("/api/health");

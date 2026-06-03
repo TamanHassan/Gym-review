@@ -16,8 +16,8 @@ const ProtectedForm = ({ isLoggedIn = false, onGymCreated = null, onReviewAdded 
 
   if (!isLoggedIn) {
     return (
-      <div style={{ padding: "20px", backgroundColor: "#f0f0f0", borderRadius: "4px" }}>
-        <p style={{ color: "#666" }}>Please log in to create gyms or add reviews</p>
+      <div className="message message-info">
+        Please log in to create gyms or add reviews
       </div>
     );
   }
@@ -70,39 +70,19 @@ const ProtectedForm = ({ isLoggedIn = false, onGymCreated = null, onReviewAdded 
   };
 
   return (
-    <div style={{ 
-      border: "1px solid #ddd", 
-      padding: "20px", 
-      borderRadius: "4px",
-      marginTop: "20px"
-    }}>
+    <div className="protected-form">
       <h3>Protected Actions</h3>
-      
-      <div style={{ marginBottom: "15px" }}>
-        <button 
+
+      <div className="form-tabs">
+        <button
           onClick={() => setFormType("gym")}
-          style={{
-            marginRight: "10px",
-            padding: "8px 16px",
-            backgroundColor: formType === "gym" ? "#007bff" : "#ccc",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer"
-          }}
+          className={`tab-btn ${formType === "gym" ? "active" : ""}`}
         >
           Create Gym
         </button>
-        <button 
+        <button
           onClick={() => setFormType("review")}
-          style={{
-            padding: "8px 16px",
-            backgroundColor: formType === "review" ? "#007bff" : "#ccc",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer"
-          }}
+          className={`tab-btn ${formType === "review" ? "active" : ""}`}
         >
           Add Review
         </button>
@@ -110,46 +90,28 @@ const ProtectedForm = ({ isLoggedIn = false, onGymCreated = null, onReviewAdded 
 
       {formType === "gym" && (
         <form onSubmit={handleCreateGym}>
-          <div style={{ marginBottom: "10px" }}>
+          <div className="form-group">
             <label>Gym Name:</label>
-            <input 
-              type="text" 
-              value={gymName} 
+            <input
+              type="text"
+              value={gymName}
               onChange={(e) => setGymName(e.target.value)}
-              style={{ 
-                width: "100%", 
-                padding: "8px", 
-                marginTop: "5px",
-                boxSizing: "border-box"
-              }}
+              className="form-control"
             />
           </div>
-          <div style={{ marginBottom: "10px" }}>
+          <div className="form-group">
             <label>Location:</label>
-            <input 
-              type="text" 
-              value={location} 
+            <input
+              type="text"
+              value={location}
               onChange={(e) => setLocation(e.target.value)}
-              style={{ 
-                width: "100%", 
-                padding: "8px", 
-                marginTop: "5px",
-                boxSizing: "border-box"
-              }}
+              className="form-control"
             />
           </div>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={loading}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#28a745",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: loading ? "not-allowed" : "pointer",
-              opacity: loading ? 0.7 : 1
-            }}
+            className="btn btn-success"
           >
             {loading ? "Creating..." : "Create Gym"}
           </button>
@@ -158,31 +120,21 @@ const ProtectedForm = ({ isLoggedIn = false, onGymCreated = null, onReviewAdded 
 
       {formType === "review" && (
         <form onSubmit={handleAddReview}>
-          <div style={{ marginBottom: "10px" }}>
+          <div className="form-group">
             <label>Gym ID:</label>
-            <input 
-              type="number" 
-              value={gymId} 
+            <input
+              type="number"
+              value={gymId}
               onChange={(e) => setGymId(e.target.value)}
-              style={{ 
-                width: "100%", 
-                padding: "8px", 
-                marginTop: "5px",
-                boxSizing: "border-box"
-              }}
+              className="form-control"
             />
           </div>
-          <div style={{ marginBottom: "10px" }}>
+          <div className="form-group">
             <label>Rating (1-5):</label>
-            <select 
-              value={rating} 
+            <select
+              value={rating}
               onChange={(e) => setRating(e.target.value)}
-              style={{ 
-                width: "100%", 
-                padding: "8px", 
-                marginTop: "5px",
-                boxSizing: "border-box"
-              }}
+              className="form-control"
             >
               <option value="1">1 - Poor</option>
               <option value="2">2 - Fair</option>
@@ -191,32 +143,18 @@ const ProtectedForm = ({ isLoggedIn = false, onGymCreated = null, onReviewAdded 
               <option value="5">5 - Excellent</option>
             </select>
           </div>
-          <div style={{ marginBottom: "10px" }}>
+          <div className="form-group">
             <label>Comment:</label>
-            <textarea 
-              value={comment} 
+            <textarea
+              value={comment}
               onChange={(e) => setComment(e.target.value)}
-              style={{ 
-                width: "100%", 
-                padding: "8px", 
-                marginTop: "5px",
-                boxSizing: "border-box",
-                minHeight: "80px"
-              }}
+              className="form-control"
             />
           </div>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={loading}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#28a745",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: loading ? "not-allowed" : "pointer",
-              opacity: loading ? 0.7 : 1
-            }}
+            className="btn btn-success"
           >
             {loading ? "Adding..." : "Add Review"}
           </button>
@@ -224,13 +162,7 @@ const ProtectedForm = ({ isLoggedIn = false, onGymCreated = null, onReviewAdded 
       )}
 
       {message && (
-        <div style={{
-          marginTop: "15px",
-          padding: "10px",
-          backgroundColor: message.includes("Error") ? "#f8d7da" : "#d4edda",
-          color: message.includes("Error") ? "#721c24" : "#155724",
-          borderRadius: "4px"
-        }}>
+        <div className={`message ${message.includes("Error") ? "message-error" : "message-success"}`}>
           {message}
         </div>
       )}

@@ -107,3 +107,39 @@ export const fetchProfile = async () => {
 
   return response.json();
 };
+
+/**
+ * Delete a gym (protected endpoint)
+ */
+export const deleteGym = async (gymId) => {
+  const headers = await getAuthHeaders();
+  const response = await fetch(`${API_BASE_URL}/gyms/${gymId}`, {
+    method: "DELETE",
+    headers,
+    credentials: "include"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete gym: ${response.status}`);
+  }
+
+  return response.json();
+};
+
+/**
+ * Delete a review (protected endpoint)
+ */
+export const deleteReview = async (gymId, reviewId) => {
+  const headers = await getAuthHeaders();
+  const response = await fetch(`${API_BASE_URL}/gyms/${gymId}/reviews/${reviewId}`, {
+    method: "DELETE",
+    headers,
+    credentials: "include"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete review: ${response.status}`);
+  }
+
+  return response.json();
+};

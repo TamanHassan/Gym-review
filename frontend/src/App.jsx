@@ -91,23 +91,37 @@ function App() {
     setGyms((currentGyms) => [...currentGyms, newGym]);
   };
 
+  const handleGymDeleted = (gymId) => {
+    setGyms((currentGyms) => currentGyms.filter((gym) => gym.id !== gymId));
+  };
+
+  const handleReviewDeleted = (gymId, reviewId) => {
+    setGyms((currentGyms) =>
+      currentGyms.map((gym) => {
+        if (gym.id === gymId) {
+          return {
+            ...gym,
+            reviews: gym.reviews.filter((review) => review.id !== reviewId)
+          };
+        }
+        return gym;
+      })
+    );
+  };
+
   const handleReviewAdded = async () => {
     await refreshGyms();
   };
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "20px", fontFamily: "Arial, sans-serif" }}>
-      <header style={{
-        borderBottom: "2px solid #007bff",
-        paddingBottom: "20px",
-        marginBottom: "20px"
-      }}>
+    <div className="container">
+      <header className="header">
         <h1>Gym Review API</h1>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="header-content">
           <p>Welcome to the Gym Review Platform</p>
           <div>
             {user ? (
-              <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+              <div className="user-info">
                 <span>Logged in as: <strong>{user.email}</strong></span>
                 <LogoutButton onLogoutClick={handleLogout} />
               </div>
@@ -119,105 +133,61 @@ function App() {
       </header>
 
       {showLoginForm && !user && (
-        <div style={{
-          border: "1px solid #ddd",
-          padding: "20px",
-          borderRadius: "4px",
-          marginBottom: "20px",
-          backgroundColor: "#f9f9f9"
-        }}>
+        <div className="login-form">
           <h3>Login to Your Account</h3>
           <form onSubmit={handleLogin}>
-            <div style={{ marginBottom: "10px" }}>
+            <div className="form-group">
               <label>Email:</label>
-              <input 
-                type="email" 
+              <input
+                type="email"
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
                 placeholder="your@email.com"
-                style={{
-                  width: "100%",
-                  padding: "8px",
-                  marginTop: "5px",
-                  boxSizing: "border-box"
-                }}
+                className="form-control"
               />
             </div>
-            <div style={{ marginBottom: "10px" }}>
+            <div className="form-group">
               <label>Password:</label>
-              <input 
-                type="password" 
+              <input
+                type="password"
                 value={loginPassword}
                 onChange={(e) => setLoginPassword(e.target.value)}
                 placeholder="••••••••"
-                style={{
-                  width: "100%",
-                  padding: "8px",
-                  marginTop: "5px",
-                  boxSizing: "border-box"
-                }}
+                className="form-control"
               />
             </div>
-            <button 
-              type="submit"
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#007bff",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-                marginRight: "10px"
-              }}
-            >
-              Login
-            </button>
-            <button 
-              type="button"
-              onClick={() => setShowLoginForm(false)}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#6c757d",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer"
-              }}
-            >
-              Cancel
-            </button>
+            <div className="form-actions">
+              <button type="submit" className="btn btn-primary">
+                Login
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowLoginForm(false)}
+                className="btn btn-secondary"
+              >
+                Cancel
+              </button>
+            </div>
           </form>
         </div>
       )}
 
       {user && profile && (
-        <div style={{
-          border: "1px solid #28a745",
-          padding: "15px",
-          borderRadius: "4px",
-          marginBottom: "20px",
-          backgroundColor: "#d4edda"
-        }}>
+        <div className="profile-card">
           <h4>Your Profile</h4>
           <p><strong>UID:</strong> {profile.uid}</p>
           <p><strong>Email:</strong> {profile.email}</p>
         </div>
       )}
 
-      <GymList gyms={gyms} loading={loading} error={error} />
+      <GymList gyms={gyms} loading={loading} error={error} user={user} onGymDeleted={handleGymDeleted} onReviewDeleted={handleReviewDeleted} />
 
       {user && (
         <ProtectedForm isLoggedIn={true} onGymCreated={handleGymCreated} onReviewAdded={handleReviewAdded} />
       )}
 
       {error && (
-        <div style={{
-          color: "red",
-          padding: "10px",
-          backgroundColor: "#f8d7da",
-          borderRadius: "4px",
-          marginTop: "20px"
-        }}>
+        <div className="message message-error">
           Error: {error}
         </div>
       )}

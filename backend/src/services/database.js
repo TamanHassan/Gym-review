@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { resetGyms } from '../data/gyms.js';
+import { resetGyms, gyms } from '../data/gyms.js';
 
 let prisma = null;
 
@@ -36,7 +36,7 @@ export const getAllGyms = async () => {
       throw error;
     }
   }
-  return [];
+  return gyms;
 };
 
 export const getGymById = async (id) => {
@@ -64,7 +64,7 @@ export const getGymById = async (id) => {
       throw error;
     }
   }
-  return null;
+  return gyms.find(g => g.id === Number(id)) || null;
 };
 
 export const createGym = async (name, location, userId) => {
@@ -80,7 +80,15 @@ export const createGym = async (name, location, userId) => {
       throw error;
     }
   }
-  throw new Error('Database not available');
+  const newGym = {
+    id: gyms.length + 1,
+    name,
+    location,
+    reviews: [],
+    createdBy: userId
+  };
+  gyms.push(newGym);
+  return newGym;
 };
 
 export const addReview = async (gymId, rating, comment, userId) => {
@@ -101,7 +109,67 @@ export const addReview = async (gymId, rating, comment, userId) => {
       throw error;
     }
   }
-  throw new Error('Database not available');
+  const gym = gyms.find(g => g.id === Number(gymId));
+  if (!gym) return null;
+  const newReview = {
+    id: gym.reviews.length + 1,
+    rating,
+    comment,
+    userId,
+    createdAt: new Date().toISOString()
+  };
+  gym.reviews.push(newReview);
+  return newReview;
+};
+
+export const deleteGym = async (gymId, userId) => {
+  if (usePrisma) {
+    try {
+      const client = getPrismaClient();
+      if (!client) throw new Error('Prisma client not available');
+      const gym = await client.gym.findUnique({
+        where: { id: Number(gymId) }
+      });
+      if (!gym) return null;
+      await client.gym.delete({
+        where: { id: Number(gymId) }
+      });
+      return gym;
+    } catch (error) {
+      console.error('deleteGym error:', error);
+      throw error;
+    }
+  }
+  const gymIndex = gyms.findIndex(g => g.id === Number(gymId));
+  if (gymIndex === -1) return null;
+  const deletedGym = gyms.splice(gymIndex, 1)[0];
+  return deletedGym;
+};
+
+export const deleteReview = async (gymId, reviewId, userId) => {
+  if (usePrisma) {
+    try {
+      const client = getPrismaClient();
+      if (!client) throw new Error('Prisma client not available');
+      const review = await client.review.findUnique({
+        where: { id: Number(reviewId) }
+      });
+      if (!review) return null;
+      await client.review.delete({
+        where: { id: Number(reviewId) }
+      });
+      return review;
+    } catch (error) {
+      console.error('deleteReview error:', error);
+      throw error;
+    }
+  }
+  const gym = gyms.find(g => g.id === Number(gymId));
+  if (!gym) return null;
+  const reviewIndex = gym.reviews.findIndex(r => r.id === Number(reviewId));
+  if (reviewIndex === -1) return null;
+  const deletedReview = gym.reviews.splice(reviewIndex, 1)[0];
+  return deletedReview;
 };
 
 export const resetDatabase = () => {

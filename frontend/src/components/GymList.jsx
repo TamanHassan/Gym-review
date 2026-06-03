@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { fetchGyms } from "../services/api.js";
+import { fetchGyms, deleteGym, deleteReview } from "../services/api.js";
 
 /**
  * GymList component - displays all available gyms
  */
-const GymList = ({ gyms = [], loading = false, error = null }) => {
+const GymList = ({ gyms = [], loading = false, error = null, user = null, onGymDeleted = null, onReviewDeleted = null }) => {
   const [expandedGymIds, setExpandedGymIds] = useState([]);
 
   const toggleReviews = (gymId) => {
@@ -15,69 +15,123 @@ const GymList = ({ gyms = [], loading = false, error = null }) => {
     );
   };
 
+  const handleDeleteGym = async (gymId) => {
+    if (!window.confirm("Are you sure you want to delete this gym?")) {
+      return;
+    }
+
+    try {
+      await deleteGym(gymId);
+      if (onGymDeleted) {
+        onGymDeleted(gymId);
+      }
+    } catch (error) {
+      alert("Failed to delete gym: " + error.message);
+    }
+  };
+
+  const handleDeleteReview = async (gymId, reviewId) => {
+    if (!window.confirm("Are you sure you want to delete this review?")) {
+      return;
+    }
+
+    try {
+      await deleteReview(gymId, reviewId);
+      if (onReviewDeleted) {
+        onReviewDeleted(gymId, reviewId);
+      }
+    } catch (error) {
+      alert("Failed to delete review: " + error.message);
+    }
+  };
+
   if (loading) {
-    return <div>Loading gyms...</div>;
+    return <div className="loading">Loading gyms...</div>;
   }
 
   if (error) {
-    return <div style={{ color: "red" }}>Error loading gyms: {error}</div>;
+    return <div className="error">Error loading gyms: {error}</div>;
   }
 
   if (!gyms || gyms.length === 0) {
-    return <div style={{ color: "#666" }}>No gyms available</div>;
+    return <div className="empty">No gyms available</div>;
   }
 
   return (
-    <div>
+    <div className="gym-list">
       <h2>Available Gyms</h2>
-      <ul style={{ listStyle: "none", padding: 0 }}>
+      <ul>
         {gyms.map((gym) => {
           const hasReviews = gym.reviews && gym.reviews.length > 0;
           const isExpanded = expandedGymIds.includes(gym.id);
 
           return (
-            <li key={gym.id} style={{
-              border: "1px solid #ddd",
-              padding: "12px",
-              marginBottom: "10px",
-              borderRadius: "4px"
-            }}>
-              <h3>{gym.name}</h3>
-              <p><strong>Location:</strong> {gym.location}</p>
-              <p><strong>Reviews:</strong> {gym.reviews?.length || 0}</p>
+            <li key={gym.id} className="gym-card">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
+                <div style={{ flex: 1 }}>
+                  <h3>{gym.name}</h3>
+                  <p><strong>Location:</strong> {gym.location}</p>
+                  <p><strong>Reviews:</strong> {gym.reviews?.length || 0}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteGym(gym.id)}
+                  className="btn btn-danger"
+                  style={{
+                    backgroundColor: "#dc3545",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    padding: "8px 16px",
+                    cursor: "pointer",
+                    fontSize: "0.9rem",
+                    fontWeight: "500"
+                  }}
+                >
+                  Delete Gym
+                </button>
+              </div>
 
               {hasReviews ? (
                 <>
                   <button
                     type="button"
                     onClick={() => toggleReviews(gym.id)}
-                    style={{
-                      padding: "8px 12px",
-                      marginTop: "10px",
-                      backgroundColor: "#007bff",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer"
-                    }}
+                    className="btn btn-outline"
                   >
                     {isExpanded ? "Hide reviews" : "Show reviews"}
                   </button>
 
                   {isExpanded && (
-                    <div style={{ marginTop: "10px" }}>
-                      <h4 style={{ margin: "0 0 8px 0" }}>Recent Reviews</h4>
-                      <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                    <div className="reviews-section">
+                      <h4>Recent Reviews</h4>
+                      <ul className="review-list">
                         {gym.reviews.map((review) => (
-                          <li key={review.id} style={{
-                            padding: "10px",
-                            marginBottom: "8px",
-                            border: "1px solid #eee",
-                            borderRadius: "4px",
-                            backgroundColor: "#fafafa"
-                          }}>
-                            <p style={{ margin: 0 }}><strong>Rating:</strong> {review.rating}/5</p>
-                            <p style={{ margin: "4px 0 0 0" }}><strong>Comment:</strong> {review.comment || "No comment provided."}</p>
+                          <li key={review.id} className="review-item">
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                              <div style={{ flex: 1 }}>
+                                <p><strong>Rating:</strong> {review.rating}/5</p>
+                                <p><strong>Comment:</strong> {review.comment || "No comment provided."}</p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteReview(gym.id, review.id)}
+                                className="btn btn-danger"
+                                style={{
+                                  backgroundColor: "#dc3545",
+                                  color: "white",
+                                  border: "none",
+                                  borderRadius: "6px",
+                                  padding: "6px 12px",
+                                  cursor: "pointer",
+                                  fontSize: "0.85rem",
+                                  fontWeight: "500",
+                                  marginLeft: "12px"
+                                }}
+                              >
+                                Delete
+                              </button>
+                            </div>
                           </li>
                         ))}
                       </ul>
@@ -85,7 +139,7 @@ const GymList = ({ gyms = [], loading = false, error = null }) => {
                   )}
                 </>
               ) : (
-                <p style={{ color: "#666", marginTop: "10px" }}>No reviews yet.</p>
+                <p className="empty">No reviews yet.</p>
               )}
             </li>
           );

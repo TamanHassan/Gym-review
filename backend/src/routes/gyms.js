@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllGyms, getGymById, createGym, addReview } from "../services/database.js";
+import { getAllGyms, getGymById, createGym, addReview, deleteGym, deleteReview } from "../services/database.js";
 import { gyms as inMemoryGyms } from "../data/gyms.js";
 import { verifyToken } from "../middleware/verifyToken.js";
 
@@ -79,6 +79,46 @@ router.post("/:id/reviews", verifyToken, async (req, res) => {
     res.status(201).json(review);
   } catch (error) {
     res.status(500).json({ error: "Failed to add review" });
+  }
+});
+
+router.delete("/:id", verifyToken, async (req, res) => {
+  try {
+    const deletedGym = await deleteGym(req.params.id, req.user.uid);
+
+    if (!deletedGym) {
+      return res.status(404).json({
+        message: "Gym not found"
+      });
+    }
+
+    res.json({ message: "Gym deleted successfully", gym: deletedGym });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete gym" });
+  }
+});
+
+router.delete("/:id/reviews/:reviewId", verifyToken, async (req, res) => {
+  try {
+    const gym = await getGymById(req.params.id);
+
+    if (!gym) {
+      return res.status(404).json({
+        message: "Gym not found"
+      });
+    }
+
+    const deletedReview = await deleteReview(req.params.id, req.params.reviewId, req.user.uid);
+
+    if (!deletedReview) {
+      return res.status(404).json({
+        message: "Review not found"
+      });
+    }
+
+    res.json({ message: "Review deleted successfully", review: deletedReview });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete review" });
   }
 });
 

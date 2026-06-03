@@ -1,5 +1,9 @@
 export default {
   test: {
-    environment: "node"
+    environment: "node",
+    setupFiles: [],
+    env: {
+      NODE_ENV: "test"
+    }
   }
 };
