@@ -10,7 +10,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [gyms, setGyms] = useState([]);
   const [profile, setProfile] = useState(null);
-  const [userRole, setUserRole] = useState("employee");
+  const [userRole, setUserRole] = useState("member");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showLoginForm, setShowLoginForm] = useState(false);
@@ -31,7 +31,7 @@ function App() {
         try {
           const userProfile = await fetchProfile();
           setProfile(userProfile);
-          setUserRole(userProfile.role || "employee");
+          setUserRole(userProfile.role || "member");
         } catch (err) {
           console.error("Failed to fetch profile:", err);
         }

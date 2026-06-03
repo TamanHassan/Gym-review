@@ -4,8 +4,8 @@ import { createGym, addReview } from "../services/api.js";
 /**
  * ProtectedForm component - allows authenticated users to create gyms and add reviews
  */
-const ProtectedForm = ({ isLoggedIn = false, userRole = "employee", onGymCreated = null, onReviewAdded = null }) => {
-  const [formType, setFormType] = useState(userRole === "owner" ? "gym" : "review"); // "gym" or "review"
+const ProtectedForm = ({ isLoggedIn = false, userRole = "member", onGymCreated = null, onReviewAdded = null }) => {
+  const [formType, setFormType] = useState(userRole === "employee" ? "gym" : "review"); // "gym" or "review"
   const [gymName, setGymName] = useState("");
   const [location, setLocation] = useState("");
   const [gymId, setGymId] = useState("");
@@ -74,7 +74,7 @@ const ProtectedForm = ({ isLoggedIn = false, userRole = "employee", onGymCreated
       <h3>Protected Actions</h3>
 
       <div className="form-tabs">
-        {userRole === "owner" && (
+        {userRole === "employee" && (
           <button
             onClick={() => setFormType("gym")}
             className={`tab-btn ${formType === "gym" ? "active" : ""}`}

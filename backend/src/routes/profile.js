@@ -10,14 +10,14 @@ router.get("/", verifyToken, async (req, res) => {
     res.json({
       uid: req.user.uid,
       email: req.user.email,
-      role: role || "employee",
+      role: role || "member",
       message: "This is your protected profile"
     });
   } catch (error) {
     res.json({
       uid: req.user.uid,
       email: req.user.email,
-      role: "employee",
+      role: "member",
       message: "This is your protected profile"
     });
   }

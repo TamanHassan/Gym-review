@@ -183,17 +183,17 @@ export const getUserRole = async (uid) => {
       const user = await client.user.findUnique({
         where: { id: uid }
       });
-      return user ? user.role : 'employee';
+      return user ? user.role : 'member';
     } catch (error) {
       console.error('getUserRole error:', error);
-      return 'employee';
+      return 'member';
     }
   }
   const user = users.get(uid);
-  return user ? user.role : 'employee';
+  return user ? user.role : 'member';
 };
 
-export const createUserOrGetRole = async (uid, email, role = 'employee') => {
+export const createUserOrGetRole = async (uid, email, role = 'member') => {
   if (usePrisma) {
     try {
       const client = getPrismaClient();
@@ -213,7 +213,7 @@ export const createUserOrGetRole = async (uid, email, role = 'employee') => {
       return user.role;
     } catch (error) {
       console.error('createUserOrGetRole error:', error);
-      return 'employee';
+      return 'member';
     }
   }
   let user = users.get(uid);

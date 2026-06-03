@@ -49,12 +49,12 @@ router.post("/", verifyToken, async (req, res) => {
       });
     }
 
-    // Check if user has owner role
+    // Check if user has employee role
     const role = await getUserRole(req.user.uid);
-    if (role !== "owner") {
+    if (role !== "employee") {
       return res.status(403).json({
         error: "Forbidden",
-        message: "Only owners can create gyms"
+        message: "Only employees can create gyms"
       });
     }
 

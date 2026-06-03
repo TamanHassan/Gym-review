@@ -66,7 +66,7 @@ describe("Gym routes", () => {
       expect(response.body.error).toBe("Unauthorized");
     });
 
-    it("should return 403 for non-owner user (employee)", async () => {
+    it("should return 403 for non-employee user (member)", async () => {
       const newGym = {
         name: "New Gym",
         location: "Copenhagen"
@@ -79,12 +79,12 @@ describe("Gym routes", () => {
 
       expect(response.status).toBe(403);
       expect(response.body.error).toBe("Forbidden");
-      expect(response.body.message).toBe("Only owners can create gyms");
+      expect(response.body.message).toBe("Only employees can create gyms");
     });
 
-    it.skip("should return 201 and create a gym with owner token", async () => {
-      // Create the user with owner role
-      await createUserOrGetRole("test-owner", "owner@example.com", "owner");
+    it.skip("should return 201 and create a gym with employee token", async () => {
+      // Create the user with employee role
+      await createUserOrGetRole("test-owner", "owner@example.com", "employee");
 
       const newGym = {
         name: "New Gym",
@@ -103,7 +103,7 @@ describe("Gym routes", () => {
     });
 
     it("should return 400 if name or location is missing", async () => {
-      await setUserRole("test-owner", "owner");
+      await setUserRole("test-owner", "employee");
 
       const response = await request(app)
         .post("/gyms")
