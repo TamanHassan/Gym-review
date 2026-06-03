@@ -78,8 +78,8 @@ const GymList = ({ gyms = [], loading = false, error = null, user = null, onGymD
                   onClick={() => handleDeleteGym(gym.id)}
                   className="btn btn-danger"
                   style={{
-                    backgroundColor: "#d1d5db",
-                    color: "#374151",
+                    backgroundColor: "#dc3545",
+                    color: "white",
                     border: "none",
                     borderRadius: "8px",
                     padding: "8px 16px",
@@ -118,8 +118,8 @@ const GymList = ({ gyms = [], loading = false, error = null, user = null, onGymD
                                 onClick={() => handleDeleteReview(gym.id, review.id)}
                                 className="btn btn-danger"
                                 style={{
-                                  backgroundColor: "#d1d5db",
-                                  color: "#374151",
+                                  backgroundColor: "#dc3545",
+                                  color: "white",
                                   border: "none",
                                   borderRadius: "6px",
                                   padding: "6px 12px",
