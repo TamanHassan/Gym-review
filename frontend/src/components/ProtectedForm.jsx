@@ -4,7 +4,7 @@ import { createGym, addReview } from "../services/api.js";
 /**
  * ProtectedForm component - allows authenticated users to create gyms and add reviews
  */
-const ProtectedForm = ({ isLoggedIn = false, userRole = "member", onGymCreated = null, onReviewAdded = null }) => {
+const ProtectedForm = ({ isLoggedIn = false, userRole = "member", onGymCreated = null, onReviewAdded = null, gyms = [] }) => {
   const [formType, setFormType] = useState(userRole === "employee" ? "gym" : "review"); // "gym" or "review"
 
   // Both members and employees can add gyms, members can add reviews
@@ -129,13 +129,20 @@ const ProtectedForm = ({ isLoggedIn = false, userRole = "member", onGymCreated =
       {formType === "review" && (
         <form onSubmit={handleAddReview}>
           <div className="form-group">
-            <label>Gym ID:</label>
-            <input
-              type="number"
+            <label>Select Gym:</label>
+            <select
               value={gymId}
               onChange={(e) => setGymId(e.target.value)}
               className="form-control"
-            />
+              required
+            >
+              <option value="">-- Select a gym --</option>
+              {gyms.map((gym) => (
+                <option key={gym.id} value={gym.id}>
+                  {gym.name} - {gym.location}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="form-group">
             <label>Rating (1-5):</label>

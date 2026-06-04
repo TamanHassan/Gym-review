@@ -202,7 +202,7 @@ function App() {
         <GymList gyms={gyms} loading={loading} error={error} user={user} onGymDeleted={handleGymDeleted} onReviewDeleted={handleReviewDeleted} />
 
         {user && (
-          <ProtectedForm isLoggedIn={true} userRole={currentUserRole} onGymCreated={handleGymCreated} onReviewAdded={handleReviewAdded} />
+          <ProtectedForm isLoggedIn={true} userRole={currentUserRole} onGymCreated={handleGymCreated} onReviewAdded={handleReviewAdded} gyms={gyms} />
         )}
 
         {error && (
