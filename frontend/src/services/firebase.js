@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword, signOut, setPersistence, browserSessionPersistence } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, setPersistence, browserSessionPersistence } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -41,6 +41,20 @@ export const login = async (email, password) => {
   }
   try {
     const result = await signInWithEmailAndPassword(auth, email, password);
+    return result.user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const register = async (email, password) => {
+  if (!firebaseInitialized) {
+    // Test mode: return mock user
+    console.warn("Firebase not initialized. Returning mock user for testing.");
+    return { uid: "test-user-" + Date.now(), email: email };
+  }
+  try {
+    const result = await createUserWithEmailAndPassword(auth, email, password);
     return result.user;
   } catch (error) {
     throw error;

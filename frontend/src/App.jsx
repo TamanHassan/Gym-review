@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { auth, firebaseInitialized, login, logout } from "./services/firebase.js";
+import { auth, firebaseInitialized, login, logout, register } from "./services/firebase.js";
 import { fetchGyms, fetchProfile } from "./services/api.js";
 import LoginButton from "./components/LoginButton.jsx";
 import LogoutButton from "./components/LogoutButton.jsx";
@@ -14,9 +14,13 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showLoginForm, setShowLoginForm] = useState(false);
+  const [showRegisterForm, setShowRegisterForm] = useState(false);
   const [loginType, setLoginType] = useState("member"); // "member" or "employee"
+  const [registerType, setRegisterType] = useState("member"); // "member" or "employee"
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [registerEmail, setRegisterEmail] = useState("");
+  const [registerPassword, setRegisterPassword] = useState("");
 
   // Monitor auth state changes
   useEffect(() => {
@@ -63,7 +67,14 @@ function App() {
 
   const handleLoginClick = (type = "member") => {
     setLoginType(type);
-    setShowLoginForm(!showLoginForm);
+    setShowLoginForm(true);
+    setShowRegisterForm(false);
+  };
+
+  const handleRegisterClick = (type = "member") => {
+    setRegisterType(type);
+    setShowRegisterForm(true);
+    setShowLoginForm(false);
   };
 
   const handleLogin = async (e) => {
@@ -77,6 +88,21 @@ function App() {
     } catch (error) {
       console.error("Login error:", error);
       alert("Login failed: " + error.message);
+    }
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+      const user = await register(registerEmail, registerPassword);
+      setUser(user);
+      setShowRegisterForm(false);
+      setRegisterEmail("");
+      setRegisterPassword("");
+      alert("Registration successful! You are now logged in as " + registerType);
+    } catch (error) {
+      console.error("Registration error:", error);
+      alert("Registration failed: " + error.message);
     }
   };
 
@@ -126,12 +152,18 @@ function App() {
           {user ? (
             <a href="#" className="navbar-link">Membership</a>
           ) : (
-            <a href="#" onClick={() => handleLoginClick("member")} className="navbar-link">Member Login</a>
+            <>
+              <a href="#" onClick={() => handleLoginClick("member")} className="navbar-link">Member Login</a>
+              <a href="#" onClick={() => handleRegisterClick("member")} className="navbar-link">Member Register</a>
+            </>
           )}
           {user ? (
             <a href="#" className="navbar-link">Employee</a>
           ) : (
-            <a href="#" onClick={() => handleLoginClick("employee")} className="navbar-link">Employee Login</a>
+            <>
+              <a href="#" onClick={() => handleLoginClick("employee")} className="navbar-link">Employee Login</a>
+              <a href="#" onClick={() => handleRegisterClick("employee")} className="navbar-link">Employee Register</a>
+            </>
           )}
           {user ? (
             <div className="user-info" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -180,6 +212,49 @@ function App() {
                 <button
                   type="button"
                   onClick={() => setShowLoginForm(false)}
+                  className="btn btn-secondary"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {showRegisterForm && !user && (
+          <div className="login-form">
+            <h3>{registerType === "member" ? "Member Registration" : "Employee Registration"}</h3>
+            <form onSubmit={handleRegister}>
+              <div className="form-group">
+                <label>Email:</label>
+                <input
+                  type="email"
+                  value={registerEmail}
+                  onChange={(e) => setRegisterEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="form-control"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Password:</label>
+                <input
+                  type="password"
+                  value={registerPassword}
+                  onChange={(e) => setRegisterPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="form-control"
+                  required
+                  minLength="6"
+                />
+              </div>
+              <div className="form-actions">
+                <button type="submit" className="btn btn-primary">
+                  Register as {registerType === "member" ? "Member" : "Employee"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowRegisterForm(false)}
                   className="btn btn-secondary"
                 >
                   Cancel
