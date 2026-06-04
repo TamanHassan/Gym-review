@@ -49,15 +49,6 @@ router.post("/", verifyToken, async (req, res) => {
       });
     }
 
-    // Check if user has employee role
-    const role = await getUserRole(req.user.uid);
-    if (role !== "employee") {
-      return res.status(403).json({
-        error: "Forbidden",
-        message: "Only employees can create gyms"
-      });
-    }
-
     const newGym = await createGym(name, location, req.user.uid);
     res.status(201).json(newGym);
   } catch (error) {
