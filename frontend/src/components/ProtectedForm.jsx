@@ -6,6 +6,10 @@ import { createGym, addReview } from "../services/api.js";
  */
 const ProtectedForm = ({ isLoggedIn = false, userRole = "member", onGymCreated = null, onReviewAdded = null }) => {
   const [formType, setFormType] = useState(userRole === "employee" ? "gym" : "review"); // "gym" or "review"
+
+  // Members can only add reviews, employees can only add gyms
+  const canAddGyms = userRole === "employee";
+  const canAddReviews = userRole === "member";
   const [gymName, setGymName] = useState("");
   const [location, setLocation] = useState("");
   const [gymId, setGymId] = useState("");
@@ -74,7 +78,7 @@ const ProtectedForm = ({ isLoggedIn = false, userRole = "member", onGymCreated =
       <h3>Protected Actions</h3>
 
       <div className="form-tabs">
-        {userRole === "employee" && (
+        {canAddGyms && (
           <button
             onClick={() => setFormType("gym")}
             className={`tab-btn ${formType === "gym" ? "active" : ""}`}
@@ -82,12 +86,14 @@ const ProtectedForm = ({ isLoggedIn = false, userRole = "member", onGymCreated =
             Create Gym
           </button>
         )}
-        <button
-          onClick={() => setFormType("review")}
-          className={`tab-btn ${formType === "review" ? "active" : ""}`}
-        >
-          Add Review
-        </button>
+        {canAddReviews && (
+          <button
+            onClick={() => setFormType("review")}
+            className={`tab-btn ${formType === "review" ? "active" : ""}`}
+          >
+            Add Review
+          </button>
+        )}
       </div>
 
       {formType === "gym" && (
