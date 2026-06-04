@@ -17,6 +17,7 @@ function App() {
   const [loginType, setLoginType] = useState("member"); // "member" or "employee"
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [showContent, setShowContent] = useState(false);
 
   // Monitor auth state changes
   useEffect(() => {
@@ -145,70 +146,74 @@ function App() {
       <div className="hero">
         <h1>Find Your Perfect Gym</h1>
         <p>Discover the best gyms in your area and read authentic reviews from members</p>
-        <button className="hero-cta">Get Started</button>
+        <button className="hero-cta" onClick={() => setShowContent(true)}>Get Started</button>
       </div>
 
       <div className="container">
-        {showLoginForm && !user && (
-          <div className="login-form">
-            <h3>{loginType === "member" ? "Member Login" : "Employee Login"}</h3>
-            <form onSubmit={handleLogin}>
-              <div className="form-group">
-                <label>Email:</label>
-                <input
-                  type="email"
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  className="form-control"
-                />
+        {showContent && (
+          <>
+            {showLoginForm && !user && (
+              <div className="login-form">
+                <h3>{loginType === "member" ? "Member Login" : "Employee Login"}</h3>
+                <form onSubmit={handleLogin}>
+                  <div className="form-group">
+                    <label>Email:</label>
+                    <input
+                      type="email"
+                      value={loginEmail}
+                      onChange={(e) => setLoginEmail(e.target.value)}
+                      placeholder="your@email.com"
+                      className="form-control"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Password:</label>
+                    <input
+                      type="password"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="form-control"
+                    />
+                  </div>
+                  <div className="form-actions">
+                    <button type="submit" className="btn btn-primary">
+                      Login as {loginType === "member" ? "Member" : "Employee"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowLoginForm(false)}
+                      className="btn btn-secondary"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
               </div>
-              <div className="form-group">
-                <label>Password:</label>
-                <input
-                  type="password"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="form-control"
-                />
+            )}
+
+
+            {user && profile && (
+              <div className="profile-card">
+                <h4>Your Profile</h4>
+                <p><strong>UID:</strong> {profile.uid}</p>
+                <p><strong>Email:</strong> {profile.email}</p>
+                <p><strong>Role:</strong> {profile.role}</p>
               </div>
-              <div className="form-actions">
-                <button type="submit" className="btn btn-primary">
-                  Login as {loginType === "member" ? "Member" : "Employee"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowLoginForm(false)}
-                  className="btn btn-secondary"
-                >
-                  Cancel
-                </button>
+            )}
+
+            <GymList gyms={gyms} loading={loading} error={error} user={user} onGymDeleted={handleGymDeleted} onReviewDeleted={handleReviewDeleted} />
+
+            {user && (
+              <ProtectedForm isLoggedIn={true} userRole={currentUserRole} onGymCreated={handleGymCreated} onReviewAdded={handleReviewAdded} gyms={gyms} />
+            )}
+
+            {error && (
+              <div className="message message-error">
+                Error: {error}
               </div>
-            </form>
-          </div>
-        )}
-
-
-        {user && profile && (
-          <div className="profile-card">
-            <h4>Your Profile</h4>
-            <p><strong>UID:</strong> {profile.uid}</p>
-            <p><strong>Email:</strong> {profile.email}</p>
-            <p><strong>Role:</strong> {profile.role}</p>
-          </div>
-        )}
-
-        <GymList gyms={gyms} loading={loading} error={error} user={user} onGymDeleted={handleGymDeleted} onReviewDeleted={handleReviewDeleted} />
-
-        {user && (
-          <ProtectedForm isLoggedIn={true} userRole={currentUserRole} onGymCreated={handleGymCreated} onReviewAdded={handleReviewAdded} gyms={gyms} />
-        )}
-
-        {error && (
-          <div className="message message-error">
-            Error: {error}
-          </div>
+            )}
+          </>
         )}
       </div>
     </>
