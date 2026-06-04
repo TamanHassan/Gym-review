@@ -1,6 +1,7 @@
 import express from "express";
 import { verifyToken } from "../middleware/verifyToken.js";
 import { getUserRole, createUserOrGetRole } from "../services/database.js";
+import { getPrismaClient } from "../services/database.js";
 
 const router = express.Router();
 
@@ -64,13 +65,38 @@ router.post("/set-role-by-email", async (req, res) => {
       });
     }
 
-    const userRole = await createUserOrGetRole(null, email, role);
+    const client = getPrismaClient();
+    if (!client) {
+      return res.status(500).json({
+        error: "Database not available"
+      });
+    }
+
+    // Find user by email
+    const user = await client.user.findUnique({
+      where: { email: email }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        error: "User not found",
+        message: "No user found with this email"
+      });
+    }
+
+    // Update user role
+    const updatedUser = await client.user.update({
+      where: { email: email },
+      data: { role: role }
+    });
+
     res.json({
       email: email,
-      role: userRole,
+      role: updatedUser.role,
       message: "Role updated successfully"
     });
   } catch (error) {
+    console.error("Set role by email error:", error);
     res.status(500).json({
       error: "Failed to set role",
       message: error.message
