@@ -51,7 +51,7 @@ router.post("/set-role", verifyToken, async (req, res) => {
 
 router.post("/set-role-by-email", async (req, res) => {
   try {
-    const { email, role } = req.body;
+    const { email, role, uid } = req.body;
     if (!email) {
       return res.status(400).json({
         error: "Bad Request",
@@ -78,23 +78,37 @@ router.post("/set-role-by-email", async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({
-        error: "User not found",
-        message: "No user found with this email"
+      // Create user if doesn't exist
+      if (!uid) {
+        return res.status(400).json({
+          error: "Bad Request",
+          message: "UID is required to create new user"
+        });
+      }
+      const newUser = await client.user.create({
+        data: {
+          id: uid,
+          email: email,
+          role: role
+        }
+      });
+      res.json({
+        email: email,
+        role: newUser.role,
+        message: "User created with role"
+      });
+    } else {
+      // Update existing user role
+      const updatedUser = await client.user.update({
+        where: { email: email },
+        data: { role: role }
+      });
+      res.json({
+        email: email,
+        role: updatedUser.role,
+        message: "Role updated successfully"
       });
     }
-
-    // Update user role
-    const updatedUser = await client.user.update({
-      where: { email: email },
-      data: { role: role }
-    });
-
-    res.json({
-      email: email,
-      role: updatedUser.role,
-      message: "Role updated successfully"
-    });
   } catch (error) {
     console.error("Set role by email error:", error);
     res.status(500).json({
