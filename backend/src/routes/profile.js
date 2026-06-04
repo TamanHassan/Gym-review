@@ -48,4 +48,34 @@ router.post("/set-role", verifyToken, async (req, res) => {
   }
 });
 
+router.post("/set-role-by-email", async (req, res) => {
+  try {
+    const { email, role } = req.body;
+    if (!email) {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "Email is required"
+      });
+    }
+    if (!role || (role !== "member" && role !== "employee")) {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "Role must be 'member' or 'employee'"
+      });
+    }
+
+    const userRole = await createUserOrGetRole(null, email, role);
+    res.json({
+      email: email,
+      role: userRole,
+      message: "Role updated successfully"
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "Failed to set role",
+      message: error.message
+    });
+  }
+});
+
 export default router;
