@@ -14,6 +14,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showLoginForm, setShowLoginForm] = useState(false);
+  const [loginType, setLoginType] = useState("member"); // "member" or "employee"
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
@@ -60,7 +61,8 @@ function App() {
     refreshGyms();
   }, []);
 
-  const handleLoginClick = () => {
+  const handleLoginClick = (type = "member") => {
+    setLoginType(type);
     setShowLoginForm(!showLoginForm);
   };
 
@@ -124,16 +126,19 @@ function App() {
           {user ? (
             <a href="#" className="navbar-link">Membership</a>
           ) : (
-            <a href="#" onClick={handleLoginClick} className="navbar-link">Membership</a>
+            <a href="#" onClick={() => handleLoginClick("member")} className="navbar-link">Member Login</a>
+          )}
+          {user ? (
+            <a href="#" className="navbar-link">Employee</a>
+          ) : (
+            <a href="#" onClick={() => handleLoginClick("employee")} className="navbar-link">Employee Login</a>
           )}
           {user ? (
             <div className="user-info" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               <span style={{ color: 'white', fontWeight: '500' }}>{user.email}</span>
               <LogoutButton onLogoutClick={handleLogout} />
             </div>
-          ) : (
-            <LoginButton onLoginClick={handleLoginClick} />
-          )}
+          ) : null}
         </div>
       </nav>
 
@@ -146,7 +151,7 @@ function App() {
       <div className="container">
         {showLoginForm && !user && (
           <div className="login-form">
-            <h3>Login to Your Account</h3>
+            <h3>{loginType === "member" ? "Member Login" : "Employee Login"}</h3>
             <form onSubmit={handleLogin}>
               <div className="form-group">
                 <label>Email:</label>
@@ -170,7 +175,7 @@ function App() {
               </div>
               <div className="form-actions">
                 <button type="submit" className="btn btn-primary">
-                  Login
+                  Login as {loginType === "member" ? "Member" : "Employee"}
                 </button>
                 <button
                   type="button"
