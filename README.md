@@ -617,6 +617,8 @@ After deploying, update these URLs:
 
 - **Frontend (Vercel)**: `https://gym-review.vercel.app`
 - **Backend (Render)**: `https://gym-review-backend.onrender.com`
+- Email: member@test.com
+- Password: Koda9090
 
 ## Troubleshooting Deployment
 
