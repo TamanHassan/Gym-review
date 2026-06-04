@@ -73,23 +73,25 @@ const GymList = ({ gyms = [], loading = false, error = null, user = null, onGymD
                   <p><strong>Location:</strong> {gym.location}</p>
                   <p><strong>Reviews:</strong> {gym.reviews?.length || 0}</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => handleDeleteGym(gym.id)}
-                  className="btn btn-danger"
-                  style={{
-                    backgroundColor: "#dc3545",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "8px",
-                    padding: "8px 16px",
-                    cursor: "pointer",
-                    fontSize: "0.9rem",
-                    fontWeight: "500"
-                  }}
-                >
-                  Delete Gym
-                </button>
+                {user && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteGym(gym.id)}
+                    className="btn btn-danger"
+                    style={{
+                      backgroundColor: "#dc3545",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "8px",
+                      padding: "8px 16px",
+                      cursor: "pointer",
+                      fontSize: "0.9rem",
+                      fontWeight: "500"
+                    }}
+                  >
+                    Delete Gym
+                  </button>
+                )}
               </div>
 
               {hasReviews ? (
@@ -113,24 +115,26 @@ const GymList = ({ gyms = [], loading = false, error = null, user = null, onGymD
                                 <p><strong>Rating:</strong> {review.rating}/5</p>
                                 <p><strong>Comment:</strong> {review.comment || "No comment provided."}</p>
                               </div>
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteReview(gym.id, review.id)}
-                                className="btn btn-danger"
-                                style={{
-                                  backgroundColor: "#dc3545",
-                                  color: "white",
-                                  border: "none",
-                                  borderRadius: "6px",
-                                  padding: "6px 12px",
-                                  cursor: "pointer",
-                                  fontSize: "0.85rem",
-                                  fontWeight: "500",
-                                  marginLeft: "12px"
-                                }}
-                              >
-                                Delete
-                              </button>
+                              {user && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteReview(gym.id, review.id)}
+                                  className="btn btn-danger"
+                                  style={{
+                                    backgroundColor: "#dc3545",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "6px",
+                                    padding: "6px 12px",
+                                    cursor: "pointer",
+                                    fontSize: "0.85rem",
+                                    fontWeight: "500",
+                                    marginLeft: "12px"
+                                  }}
+                                >
+                                  Delete
+                                </button>
+                              )}
                             </div>
                           </li>
                         ))}

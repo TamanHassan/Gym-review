@@ -116,84 +116,92 @@ function App() {
   };
 
   return (
-    <div className="container">
-      <header className="header">
-        <h1>Gym Review API</h1>
-        <div className="header-content">
-          <p>Welcome to the Gym Review Platform</p>
-          <div>
-            {user ? (
-              <div className="user-info">
-                <span>Logged in as: <strong>{user.email}</strong></span>
-                <LogoutButton onLogoutClick={handleLogout} />
+    <>
+      <nav className="navbar">
+        <a href="#" className="navbar-brand">Gym Review</a>
+        <div className="navbar-menu">
+          <a href="#" className="navbar-link">Find Gyms</a>
+          <a href="#" className="navbar-link">Membership</a>
+          {user ? (
+            <div className="user-info" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <span style={{ color: 'white', fontWeight: '500' }}>{user.email}</span>
+              <LogoutButton onLogoutClick={handleLogout} />
+            </div>
+          ) : (
+            <LoginButton onLoginClick={handleLoginClick} />
+          )}
+        </div>
+      </nav>
+
+      <div className="hero">
+        <h1>Find Your Perfect Gym</h1>
+        <p>Discover the best gyms in your area and read authentic reviews from members</p>
+        <button className="hero-cta">Get Started</button>
+      </div>
+
+      <div className="container">
+        {showLoginForm && !user && (
+          <div className="login-form">
+            <h3>Login to Your Account</h3>
+            <form onSubmit={handleLogin}>
+              <div className="form-group">
+                <label>Email:</label>
+                <input
+                  type="email"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="form-control"
+                />
               </div>
-            ) : (
-              <LoginButton onLoginClick={handleLoginClick} />
-            )}
+              <div className="form-group">
+                <label>Password:</label>
+                <input
+                  type="password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="form-control"
+                />
+              </div>
+              <div className="form-actions">
+                <button type="submit" className="btn btn-primary">
+                  Login
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowLoginForm(false)}
+                  className="btn btn-secondary"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
-        </div>
-      </header>
+        )}
 
-      {showLoginForm && !user && (
-        <div className="login-form">
-          <h3>Login to Your Account</h3>
-          <form onSubmit={handleLogin}>
-            <div className="form-group">
-              <label>Email:</label>
-              <input
-                type="email"
-                value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
-                placeholder="your@email.com"
-                className="form-control"
-              />
-            </div>
-            <div className="form-group">
-              <label>Password:</label>
-              <input
-                type="password"
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-                placeholder="••••••••"
-                className="form-control"
-              />
-            </div>
-            <div className="form-actions">
-              <button type="submit" className="btn btn-primary">
-                Login
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowLoginForm(false)}
-                className="btn btn-secondary"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+        {user && profile && (
+          <div className="profile-card">
+            <h4>Your Profile</h4>
+            <p><strong>UID:</strong> {profile.uid}</p>
+            <p><strong>Email:</strong> {profile.email}</p>
+            <p><strong>Role:</strong> {profile.role}</p>
+          </div>
+        )}
 
-      {user && profile && (
-        <div className="profile-card">
-          <h4>Your Profile</h4>
-          <p><strong>UID:</strong> {profile.uid}</p>
-          <p><strong>Email:</strong> {profile.email}</p>
-        </div>
-      )}
+        <GymList gyms={gyms} loading={loading} error={error} user={user} onGymDeleted={handleGymDeleted} onReviewDeleted={handleReviewDeleted} />
 
-      <GymList gyms={gyms} loading={loading} error={error} user={user} onGymDeleted={handleGymDeleted} onReviewDeleted={handleReviewDeleted} />
+        {user && (
+          <ProtectedForm isLoggedIn={true} userRole={userRole} onGymCreated={handleGymCreated} onReviewAdded={handleReviewAdded} />
+        )}
 
-      {user && (
-        <ProtectedForm isLoggedIn={true} userRole={userRole} onGymCreated={handleGymCreated} onReviewAdded={handleReviewAdded} />
-      )}
-
-      {error && (
-        <div className="message message-error">
-          Error: {error}
-        </div>
-      )}
-    </div>
+        {error && (
+          <div className="message message-error">
+            Error: {error}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
