@@ -9,7 +9,7 @@ const users = new Map();
 // Use Prisma for all non-test environments
 const usePrisma = process.env.NODE_ENV !== 'test';
 
-const getPrismaClient = () => {
+export const getPrismaClient = () => {
   if (!prisma && usePrisma) {
     try {
       prisma = new PrismaClient();
