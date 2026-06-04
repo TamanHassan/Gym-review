@@ -7,8 +7,8 @@ import { createGym, addReview } from "../services/api.js";
 const ProtectedForm = ({ isLoggedIn = false, userRole = "member", onGymCreated = null, onReviewAdded = null }) => {
   const [formType, setFormType] = useState(userRole === "employee" ? "gym" : "review"); // "gym" or "review"
 
-  // Members can only add reviews, employees can only add gyms
-  const canAddGyms = userRole === "employee";
+  // Both members and employees can add gyms, members can add reviews
+  const canAddGyms = true;
   const canAddReviews = userRole === "member";
   const [gymName, setGymName] = useState("");
   const [location, setLocation] = useState("");
