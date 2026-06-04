@@ -121,7 +121,11 @@ function App() {
         <a href="#" className="navbar-brand">Gym Review</a>
         <div className="navbar-menu">
           <a href="#" className="navbar-link">Find Gyms</a>
-          <a href="#" className="navbar-link">Membership</a>
+          {user ? (
+            <a href="#" className="navbar-link">Membership</a>
+          ) : (
+            <a href="#" onClick={handleLoginClick} className="navbar-link">Membership</a>
+          )}
           {user ? (
             <div className="user-info" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               <span style={{ color: 'white', fontWeight: '500' }}>{user.email}</span>
