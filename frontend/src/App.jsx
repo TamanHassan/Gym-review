@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { auth, firebaseInitialized, login, logout, register } from "./services/firebase.js";
-import { fetchGyms, fetchProfile } from "./services/api.js";
+import { fetchGyms, fetchProfile, setUserRole } from "./services/api.js";
 import LoginButton from "./components/LoginButton.jsx";
 import LogoutButton from "./components/LogoutButton.jsx";
 import GymList from "./components/GymList.jsx";
@@ -10,7 +10,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [gyms, setGyms] = useState([]);
   const [profile, setProfile] = useState(null);
-  const [userRole, setUserRole] = useState("member");
+  const [currentUserRole, setCurrentUserRole] = useState("member");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showLoginForm, setShowLoginForm] = useState(false);
@@ -36,7 +36,7 @@ function App() {
         try {
           const userProfile = await fetchProfile();
           setProfile(userProfile);
-          setUserRole(userProfile.role || "member");
+          setCurrentUserRole(userProfile.role || "member");
         } catch (err) {
           console.error("Failed to fetch profile:", err);
         }
@@ -99,7 +99,16 @@ function App() {
       setShowRegisterForm(false);
       setRegisterEmail("");
       setRegisterPassword("");
-      alert("Registration successful! You are now logged in as " + registerType);
+
+      // Set the role in the database
+      try {
+        await setUserRole(registerType);
+        setCurrentUserRole(registerType);
+        alert("Registration successful! You are now logged in as " + registerType);
+      } catch (roleError) {
+        console.error("Failed to set role:", roleError);
+        alert("Registration successful, but failed to set role. Please contact support.");
+      }
     } catch (error) {
       console.error("Registration error:", error);
       alert("Registration failed: " + error.message);
@@ -276,7 +285,7 @@ function App() {
         <GymList gyms={gyms} loading={loading} error={error} user={user} onGymDeleted={handleGymDeleted} onReviewDeleted={handleReviewDeleted} />
 
         {user && (
-          <ProtectedForm isLoggedIn={true} userRole={userRole} onGymCreated={handleGymCreated} onReviewAdded={handleReviewAdded} />
+          <ProtectedForm isLoggedIn={true} userRole={currentUserRole} onGymCreated={handleGymCreated} onReviewAdded={handleReviewAdded} />
         )}
 
         {error && (

@@ -109,6 +109,25 @@ export const fetchProfile = async () => {
 };
 
 /**
+ * Set user role (protected endpoint)
+ */
+export const setUserRole = async (role) => {
+  const headers = await getAuthHeaders();
+  const response = await fetch(`${API_BASE_URL}/profile/set-role`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ role }),
+    credentials: "include"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to set role: ${response.status}`);
+  }
+
+  return response.json();
+};
+
+/**
  * Delete a gym (protected endpoint)
  */
 export const deleteGym = async (gymId) => {
